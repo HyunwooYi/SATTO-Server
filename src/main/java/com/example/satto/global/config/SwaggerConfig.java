@@ -1,4 +1,4 @@
-package com.satto.global.config;
+package com.example.satto.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
