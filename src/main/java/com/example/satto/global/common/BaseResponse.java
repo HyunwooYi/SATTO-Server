@@ -1,6 +1,7 @@
 package com.example.satto.global.common;
 
 import com.example.satto.global.common.code.BaseCode;
+import com.example.satto.global.common.code.status.ErrorStatus;
 import com.example.satto.global.common.code.status.SuccessStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,6 +34,10 @@ public class BaseResponse<T> {
     // 실패한 경우 응답 생성
     public static <T> BaseResponse<T> onFailure(String code, String message, T data) {
         return new BaseResponse<>(false, code, message, data);
+    }
+
+    public static <T> BaseResponse<T> onFailure(T result) {
+        return new BaseResponse<>(false, ErrorStatus._BAD_REQUEST.getCode(), ErrorStatus._BAD_REQUEST.getMessage(), result);
     }
 
     // 게시된 경우 응답 생성

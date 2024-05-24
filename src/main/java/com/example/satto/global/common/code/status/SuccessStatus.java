@@ -12,7 +12,9 @@ public enum SuccessStatus implements BaseCode {
 
     _OK(HttpStatus.OK, "COMMON200", "성공입니다."),
     _CREATED(HttpStatus.CREATED, "COMMON201", "요청 성공 및 리소스 생성됨"),
-    _NO_CONTENT(HttpStatus.NO_CONTENT, "COMMON204", "삭제되었습니다.");
+    _NO_CONTENT(HttpStatus.NO_CONTENT, "COMMON204", "삭제되었습니다."),
+
+    _FOLLOW_REQUEST(HttpStatus.OK, "COMMON210", "팔로우 요청 성공");
 
     private final HttpStatus httpStatus;
     private final String code;
