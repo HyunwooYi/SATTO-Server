@@ -2,6 +2,7 @@
 *.yml
 **/application.yml
 
+
 # 배포에 필요
 !gradle-wrapper.jar
 # Compiled class file
