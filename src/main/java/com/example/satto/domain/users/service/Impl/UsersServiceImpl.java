@@ -45,16 +45,18 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public Object viewFollowerList(String studentId) {
-        Map<String, String> followerMap = new HashMap<>();
+        List<Map<String, String>> followerMap = new ArrayList<>();
+
         Optional<Users> optionalUser = usersRepository.findByStudentId(studentId);
         if (optionalUser.isPresent()) {
             Users user = optionalUser.get();
 
             for (Follow followerId : user.getFollowingList()) {
                 if ((followerId.getRequest() == 2) && (!followerId.getFollowingId().equals(user.getStudentId()))) {
-                    followerMap.put(followerId.getFollowerId().getStudentId(), followerId.getFollowerId().getName());
-//                    followerList.add(followerId.getFollowerId().getEmail());
+                    Map<String, String> userMap = getUserMap(followerId);
+                    followerMap.add(userMap);
                 }
+                
             }
             return followerMap;
         } else {
@@ -62,23 +64,50 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+    private static Map<String, String> getUserMap(Follow followerId) {
+        Map<String, String> userMap = new HashMap<>();
+
+        userMap.put("studentId", followerId.getFollowerId().getStudentId());
+        userMap.put("name", followerId.getFollowerId().getName());
+        userMap.put("nickname", followerId.getFollowerId().getNickname());
+        userMap.put("email", followerId.getFollowerId().getEmail());
+        userMap.put("department", followerId.getFollowerId().getDepartment());
+        userMap.put("grade", String.valueOf(followerId.getFollowerId().getGrade()));
+        userMap.put("isPublic", String.valueOf(followerId.getFollowerId().isPublic()));
+        return userMap;
+    }
+
     @Override
     public Object viewFollowingList(String studentId) {
-        Map<String, String> followingMap = new HashMap<>();
+        List<Map<String, String>> followingMap = new ArrayList<>();
+
         Optional<Users> optionalUser = usersRepository.findByStudentId(studentId);
         if (optionalUser.isPresent()) {
             Users user = optionalUser.get();
 
             for (Follow followingId : user.getFollowerList()) {
                 if ((followingId.getRequest() == 2) && (!followingId.getFollowerId().equals(user.getStudentId()))) {
-                    followingMap.put(followingId.getFollowingId().getStudentId(), followingId.getFollowingId().getName());
-//                    followingList.add(followingId.getFollowingId().getStudentId());
+                    Map<String, String> userMap = getMap(followingId);
+                    followingMap.add(userMap);
                 }
             }
             return followingMap;
         } else {
             return new UsersHandler(ErrorStatus._NOT_FOUND_USER);
         }
+    }
+
+    private static Map<String, String> getMap(Follow followingId) {
+        Map<String, String> userMap = new HashMap<>();
+
+        userMap.put("studentId", followingId.getFollowingId().getStudentId());
+        userMap.put("name", followingId.getFollowingId().getName());
+        userMap.put("nickname", followingId.getFollowingId().getNickname());
+        userMap.put("email", followingId.getFollowingId().getEmail());
+        userMap.put("department", followingId.getFollowingId().getDepartment());
+        userMap.put("grade", String.valueOf(followingId.getFollowingId().getGrade()));
+        userMap.put("isPublic", String.valueOf(followingId.getFollowingId().isPublic()));
+        return userMap;
     }
 
     @Override
@@ -149,7 +178,7 @@ public class UsersServiceImpl implements UsersService {
 
         usersRepository.save(user);
         return user;
-}
+    }
 
     @Override
     public boolean emailDuplicate(String email) {

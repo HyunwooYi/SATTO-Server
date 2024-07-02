@@ -137,5 +137,4 @@ public class Users extends BaseEntity implements UserDetails {
         return true;
     }
 
-
 }
