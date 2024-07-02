@@ -60,7 +60,7 @@ public class UsersServiceImpl implements UsersService {
             }
             return followerMap;
         } else {
-            return new UsersHandler(ErrorStatus._NOT_FOUND_USER);
+            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
         }
     }
 
@@ -93,7 +93,7 @@ public class UsersServiceImpl implements UsersService {
             }
             return followingMap;
         } else {
-            return new UsersHandler(ErrorStatus._NOT_FOUND_USER);
+            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
         }
     }
 
@@ -124,7 +124,7 @@ public class UsersServiceImpl implements UsersService {
             }
             return followerList;
         } else {
-            return new UsersHandler(ErrorStatus._NOT_FOUND_USER);
+            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
         }
 
     }
@@ -143,7 +143,7 @@ public class UsersServiceImpl implements UsersService {
             }
             return followingList;
         } else {
-            return new UsersHandler(ErrorStatus._NOT_FOUND_USER);
+            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
         }
 
     }
