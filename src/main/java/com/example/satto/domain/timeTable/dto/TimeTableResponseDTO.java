@@ -89,7 +89,7 @@ public record TimeTableResponseDTO(
                     .timeTableId(timeTable.getTimetableId())
                     .lects(lects)
                     .semesterYear(timeTable.getSemesterYear())
-                    .timeTableName(builder().timeTableName)
+                    .timeTableName(timeTable.getTimetableName())
                     .isPublic(timeTable.getIsPublic())
                     .isRepresented(timeTable.getIsRepresented())
                     .build();
