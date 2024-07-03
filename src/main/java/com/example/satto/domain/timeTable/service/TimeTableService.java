@@ -132,19 +132,24 @@ public class TimeTableService {
         }
 
         String[] timeSegments = impossibleTimeZones.split(" ");
-        List<Integer> toRemoveIndex = new ArrayList<>();
-        for (String time : timeSegments) {
-            for (int i = 0; i < majorLectDetailList.size(); i++) {
-                if (majorLectDetailList.get(i).lectTime().contains(time)) {
-                    toRemoveIndex.add(i);
+        Set<String> impossibleTimeSet = new HashSet<>(Arrays.asList(timeSegments));
+        List<TimeTableResponseDTO.TimeTableLectureDTO> filteredList = new ArrayList<>();
+
+        for (TimeTableResponseDTO.TimeTableLectureDTO lecture : majorLectDetailList) {
+            boolean isPossible = true;
+            String[] lectureTimes = lecture.lectTime().split(" ");
+            for (String time : lectureTimes) {
+                if (impossibleTimeSet.contains(time)) {
+                    isPossible = false;
+                    break;
                 }
             }
+            if (isPossible) {
+                filteredList.add(lecture);
+            }
         }
-        Collections.reverse(toRemoveIndex);
-        for (int index : toRemoveIndex) {
-            majorLectDetailList.remove(index);
-        }
-        return majorLectDetailList;
+
+        return filteredList;
     }
 
     //전공 조합의 개수 계산
