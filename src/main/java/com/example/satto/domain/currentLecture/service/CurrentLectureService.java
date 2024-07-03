@@ -4,6 +4,8 @@ import com.example.satto.domain.currentLecture.dto.CurrentLectureRequestDto;
 import com.example.satto.domain.currentLecture.dto.CurrentLectureResponseDTO;
 import com.example.satto.domain.currentLecture.repository.CurrentLectureRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +16,7 @@ public class CurrentLectureService {
 
     private final CurrentLectureRepository currentLectureRepository;
 
-    public List<CurrentLectureResponseDTO> getLectures(CurrentLectureRequestDto currentLectureRequestDto) {
+    public Page<CurrentLectureResponseDTO> getLectures(CurrentLectureRequestDto currentLectureRequestDto, Integer page) {
         return currentLectureRepository.findLectures(
                 currentLectureRequestDto.lectName(),
                 currentLectureRequestDto.grade(),
@@ -27,7 +29,8 @@ public class CurrentLectureService {
                 currentLectureRequestDto.engineering(),
                 currentLectureRequestDto.art(),
                 currentLectureRequestDto.isCyber(),
-                List.of(currentLectureRequestDto.timeZone().split(" "))
+                List.of(currentLectureRequestDto.timeZone().split(" ")),
+                PageRequest.of(page, 10)
         );
     }
 }

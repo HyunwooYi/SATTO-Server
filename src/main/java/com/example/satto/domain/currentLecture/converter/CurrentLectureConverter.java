@@ -3,8 +3,10 @@ package com.example.satto.domain.currentLecture.converter;
 import com.example.satto.domain.currentLecture.dto.CurrentLectureListResponseDTO;
 import com.example.satto.domain.currentLecture.dto.CurrentLectureResponseDTO;
 import com.example.satto.domain.currentLecture.entity.CurrentLecture;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CurrentLectureConverter {
 
@@ -39,4 +41,14 @@ public class CurrentLectureConverter {
                 .map(CurrentLectureConverter::toCurrentLectureResponseDto)
                 .toList();
     }
+
+    public static CurrentLectureListResponseDTO toCurrentLectureDtoList(Page<CurrentLectureResponseDTO> currentLectureList) {
+        return CurrentLectureListResponseDTO.builder()
+                .currentLectureResponseDTOList(currentLectureList.stream().collect(Collectors.toList()))                .isLast(currentLectureList.isLast())
+                .isFirst(currentLectureList.isFirst())
+                .totalPage(currentLectureList.getTotalPages())
+                .listSize(currentLectureList.getSize())
+                .build();
+    }
+
 }

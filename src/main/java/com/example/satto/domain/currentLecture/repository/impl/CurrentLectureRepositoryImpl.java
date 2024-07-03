@@ -8,6 +8,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,10 +22,10 @@ public class CurrentLectureRepositoryImpl implements CurrentLectureRepositoryCus
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<CurrentLectureResponseDTO> findLectures(
+    public Page<CurrentLectureResponseDTO> findLectures(
             String lectName, List<Integer> grade, int elective,
             int normal, int essential, byte humanity, byte society,
-            byte nature, byte engineering, byte art, byte isCyber, List<String> timeZone) {
+            byte nature, byte engineering, byte art, byte isCyber, List<String> timeZone, Pageable pageable) {
 
         QCurrentLecture lecture = QCurrentLecture.currentLecture;
         BooleanBuilder builder = new BooleanBuilder();
@@ -72,7 +75,7 @@ public class CurrentLectureRepositoryImpl implements CurrentLectureRepositoryCus
             }
         }
 
-        return queryFactory
+        List<CurrentLectureResponseDTO> results = queryFactory
                 .select(Projections.constructor(CurrentLectureResponseDTO.class,
                         lecture.department,
                         lecture.code,
@@ -86,6 +89,16 @@ public class CurrentLectureRepositoryImpl implements CurrentLectureRepositoryCus
                         lecture.credit))
                 .from(lecture)
                 .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        Long total = queryFactory
+                .select(lecture.count())
+                .from(lecture)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(results, pageable, total);
     }
 }
