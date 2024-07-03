@@ -65,6 +65,12 @@ public class TimeTableController {
         return BaseResponse.onSuccess("수정되었습니다");
     }
 
+    @PatchMapping("/{timeTableId}/name")
+    public BaseResponse<String> updateTimeTableName(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody UpdateTimeTableNameRequestDTO timeTableName){
+        timeTableService.updateTimeTableName(timeTableId, timeTableName);
+        return BaseResponse.onSuccess("수정되었습니다");
+    }
+
     @DeleteMapping("/{timeTableId}")
     public BaseResponse<String> deleteTimeTable(@PathVariable(name = "timeTableId") Long timeTableId){
         timeTableService.deleteTimeTable(timeTableId);

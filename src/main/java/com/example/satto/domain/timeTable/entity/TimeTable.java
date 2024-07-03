@@ -35,7 +35,10 @@ public class TimeTable extends BaseEntity {
         this.isPublic = isPublic;
     }
 
-    public void updateIdRepresented(boolean isRepresented){
+    public void updateIsRepresented(boolean isRepresented){
         this.isRepresented = isRepresented;
+    }
+    public void updateName(String timetableName){
+        this.timetableName = timetableName;
     }
 }

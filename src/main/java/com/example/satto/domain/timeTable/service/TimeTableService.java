@@ -300,7 +300,13 @@ public class TimeTableService {
             }
         }
 
-        timeTable.updateIdRepresented(isRepresented.state());
+        timeTable.updateIsRepresented(isRepresented.state());
+        timeTableRepository.save(timeTable);
+    }
+
+    public void updateTimeTableName(Long timeTableId, UpdateTimeTableNameRequestDTO timeTableName){
+        TimeTable timeTable = timeTableRepository.findById(timeTableId).orElseThrow();
+        timeTable.updateName(timeTableName.timeTableName());
         timeTableRepository.save(timeTable);
     }
 
