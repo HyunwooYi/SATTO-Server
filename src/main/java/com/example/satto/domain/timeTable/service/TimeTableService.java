@@ -93,6 +93,8 @@ public class TimeTableService {
         List<CurrentLecture> requiredLectList = new ArrayList<>();
         List<TimeTableResponseDTO.TimeTableLectureDTO> requiredLectDetailList = new ArrayList<>();
 
+        majorLectDetailList = removeLecturesInImpossibleTimeZones(majorLectDetailList, createDTO.impossibleTimeZone());
+
         if(!createDTO.requiredLect().get(0).isEmpty()) {
 
             for (String lectCodeSection : createDTO.requiredLect()) {
@@ -104,7 +106,7 @@ public class TimeTableService {
             generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, createDTO.majorCount() + requiredLectDetailList.size());
         }
 
-        majorLectDetailList = removeLecturesInImpossibleTimeZones(majorLectDetailList, createDTO.impossibleTimeZone());
+
 
         //필수로 들어야할 강의 우선 조합
 
@@ -195,6 +197,7 @@ public class TimeTableService {
         List<List<TimeTableResponseDTO.TimeTableLectureDTO>> timeTable = new ArrayList<>();
         List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result;
 
+        majorLectDetailList = removeLecturesInImpossibleTimeZones(majorLectDetailList, createDTO.impossibleTimeZone());
         entireLectList = removeLecturesInImpossibleTimeZones(entireLectList, createDTO.impossibleTimeZone());
 
         //임의 교양 리스트 생성
