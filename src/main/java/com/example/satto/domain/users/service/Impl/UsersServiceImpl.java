@@ -1,6 +1,5 @@
 package com.example.satto.domain.users.service.Impl;
 
-import com.example.satto.config.security.token.TokenRepository;
 import com.example.satto.domain.follow.entity.Follow;
 import com.example.satto.domain.follow.repository.FollowRepository;
 import com.example.satto.domain.mail.dto.EmailRequestDTO;
@@ -11,15 +10,12 @@ import com.example.satto.domain.users.service.UsersService;
 import com.example.satto.global.common.code.status.ErrorStatus;
 import com.example.satto.global.common.exception.handler.UsersHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
-
 
 @Service
 @RequiredArgsConstructor
@@ -27,149 +23,110 @@ public class UsersServiceImpl implements UsersService {
 
     private final UsersRepository usersRepository;
     private final FollowRepository followRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-
 
     @Override
     public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            @Override
-            public UserDetails loadUserByUsername(String email) {
-                return usersRepository.findByEmail(email)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            }
-        };
+        return email -> usersRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
     }
 
     @Override
-    public Object viewFollowerList(String studentId) {
-        List<Map<String, String>> followerMap = new ArrayList<>();
-
-        Optional<Users> optionalUser = usersRepository.findByStudentId(studentId);
-        if (optionalUser.isPresent()) {
-            Users user = optionalUser.get();
-
-            for (Follow followerId : user.getFollowingList()) {
-                if ((followerId.getRequest() == 2) && (!followerId.getFollowingId().equals(user.getStudentId()))) {
-                    Map<String, String> userMap = getUserMap(followerId);
-                    followerMap.add(userMap);
-                }
-                
-            }
-            return followerMap;
-        } else {
-            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
-        }
+    public List<Map<String, String>> viewFollowerList(String studentId) {
+        return getFollowList(studentId, true);
     }
 
-    private static Map<String, String> getUserMap(Follow followerId) {
+    @Override
+    public List<Map<String, String>> viewFollowingList(String studentId) {
+        return getFollowList(studentId, false);
+    }
+
+    private List<Map<String, String>> getFollowList(String studentId, boolean isFollower) {
+        Users user = usersRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        List<Follow> followList = isFollower ? user.getFollowingList() : user.getFollowerList();
+        // 내가 상대를 팔로잉 할때 DB에는 내가 follwer_id 이고 상대방이 following_id로 들어간다.
+        // 그래서 팔로잉 리스트 조회시 user.getFollowerList(); 호출
+
+        List<Map<String, String>> followMap = new ArrayList<>();
+        for (Follow follow : followList) {
+            Users relatedUser = isFollower ? follow.getFollowerId() : follow.getFollowingId();
+            // isFollower가 true이면 나를 팔로우하는 사람들의 정보(followerId)
+            // false이면 내가 팔로우하는 사람들의 정보(followingId)
+            if (follow.getRequest() == 2 && !relatedUser.getStudentId().equals(studentId)) {
+                followMap.add(convertFollowToMap(relatedUser));
+            }
+        }
+        return followMap;
+    }
+
+    private Map<String, String> convertFollowToMap(Users user) {
         Map<String, String> userMap = new HashMap<>();
+        userMap.put("studentId", user.getStudentId());
+        userMap.put("name", user.getName());
+        userMap.put("nickname", user.getNickname());
+        userMap.put("email", user.getEmail());
+        userMap.put("department", user.getDepartment());
+        userMap.put("grade", String.valueOf(user.getGrade()));
+        userMap.put("isPublic", String.valueOf(user.isPublic()));
+        return userMap;    }
 
-        userMap.put("studentId", followerId.getFollowerId().getStudentId());
-        userMap.put("name", followerId.getFollowerId().getName());
-        userMap.put("nickname", followerId.getFollowerId().getNickname());
-        userMap.put("email", followerId.getFollowerId().getEmail());
-        userMap.put("department", followerId.getFollowerId().getDepartment());
-        userMap.put("grade", String.valueOf(followerId.getFollowerId().getGrade()));
-        userMap.put("isPublic", String.valueOf(followerId.getFollowerId().isPublic()));
-        return userMap;
+    @Override
+    public List<String> followerListNum(String studentId) {
+        return getFollowListEmails(studentId, true);
     }
 
     @Override
-    public Object viewFollowingList(String studentId) {
-        List<Map<String, String>> followingMap = new ArrayList<>();
-
-        Optional<Users> optionalUser = usersRepository.findByStudentId(studentId);
-        if (optionalUser.isPresent()) {
-            Users user = optionalUser.get();
-
-            for (Follow followingId : user.getFollowerList()) {
-                if ((followingId.getRequest() == 2) && (!followingId.getFollowerId().equals(user.getStudentId()))) {
-                    Map<String, String> userMap = getMap(followingId);
-                    followingMap.add(userMap);
-                }
-            }
-            return followingMap;
-        } else {
-            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
-        }
+    public List<String> followingListNum(String studentId) {
+        return getFollowListEmails(studentId, false);
     }
 
-    private static Map<String, String> getMap(Follow followingId) {
-        Map<String, String> userMap = new HashMap<>();
+    private List<String> getFollowListEmails(String studentId, boolean isFollower) {
+        Users user = usersRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        List<Follow> followList = isFollower ? user.getFollowingList() : user.getFollowerList();
 
-        userMap.put("studentId", followingId.getFollowingId().getStudentId());
-        userMap.put("name", followingId.getFollowingId().getName());
-        userMap.put("nickname", followingId.getFollowingId().getNickname());
-        userMap.put("email", followingId.getFollowingId().getEmail());
-        userMap.put("department", followingId.getFollowingId().getDepartment());
-        userMap.put("grade", String.valueOf(followingId.getFollowingId().getGrade()));
-        userMap.put("isPublic", String.valueOf(followingId.getFollowingId().isPublic()));
-        return userMap;
-    }
+        List<String> emails = new ArrayList<>();
+        for (Follow follow : followList) {
+            Users relatedUser = isFollower ? follow.getFollowerId() : follow.getFollowingId();
+            // isFollower가 true이면 나를 팔로우하는 사람들의 정보(followerId)
+            // false이면 내가 팔로우하는 사람들의 정보(followingId)
 
-    @Override
-    public Object followerListNum(String studentId) {
-        List<String> followerList = new ArrayList<>();
-        Optional<Users> optionalUser = usersRepository.findByStudentId(studentId);
-        if (optionalUser.isPresent()) {
-            Users user = optionalUser.get();
-
-            for (Follow followerId : user.getFollowingList()) {
-                if ((followerId.getRequest() == 2) && (!followerId.getFollowingId().equals(user.getStudentId()))) {
-                    followerList.add(followerId.getFollowerId().getEmail());
-                }
+            if (follow.getRequest() == 2 && !relatedUser.getStudentId().equals(studentId)) {
+                emails.add(relatedUser.getEmail());
             }
-            return followerList;
-        } else {
-            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
         }
-
-    }
-
-    @Override
-    public Object followingListNum(String studentId) {
-        List<String> followingList = new ArrayList<>();
-        Optional<Users> optionalUser = usersRepository.findByStudentId(studentId);
-        if (optionalUser.isPresent()) {
-            Users user = optionalUser.get();
-
-            for (Follow followingId : user.getFollowerList()) {
-                if ((followingId.getRequest() == 2) && (!followingId.getFollowerId().equals(user.getStudentId()))) {
-                    followingList.add(followingId.getFollowingId().getStudentId());
-                }
-            }
-            return followingList;
-        } else {
-            throw new UsersHandler(ErrorStatus._NOT_FOUND_USER);
-        }
-
+        return emails;
     }
 
     @Override
     public Users userProfile(Long userId) {
-        return usersRepository.findById(userId).orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        return usersRepository.findById(userId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
     }
 
     @Override
     public void privateAccount(Long userId) {
-        Users user = usersRepository.findById(userId).orElseThrow();
-        user.setPublic(false);
-        usersRepository.save(user);
+        changeAccountVisibility(userId, false);
     }
 
     @Override
     public void publicAccount(Long userId) {
-        Users user = usersRepository.findById(userId).orElseThrow();
-        user.setPublic(true);
+        changeAccountVisibility(userId, true);
+    }
+
+    private void changeAccountVisibility(Long userId, boolean isPublic) {
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        user.setPublic(isPublic);
         usersRepository.save(user);
     }
 
     @Override
     public Users updateAccount(UsersRequestDTO.UpdateUserDTO updateUserDTO, Long userId) {
-        Users user = usersRepository.findById(userId).orElseThrow();
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
 
         user.setName(updateUserDTO.getName());
         user.setNickname(updateUserDTO.getNickname());
@@ -182,50 +139,42 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public boolean emailDuplicate(String email) {
-        return (usersRepository.existsByEmail(email));
-
+        return usersRepository.existsByEmail(email);
     }
 
     @Override
     public Users uploadProfileImg(String url, String email) {
-        Optional<Users> optionalUser = usersRepository.findByEmail(email);
-        if (optionalUser.isPresent()) {
-            Users user = optionalUser.get();
-            user.setProfileImg(url);
-
-            return usersRepository.save(user);
-        } else {
-            return null;
-        }
+        Users user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        user.setProfileImg(url);
+        return usersRepository.save(user);
     }
 
     @Override
     public boolean nicknameDuplicate(String nickname) {
-        return (usersRepository.existsByNickname(nickname));
+        return usersRepository.existsByNickname(nickname);
     }
 
     @Override
     @Transactional
     public void withdrawal(Users user) {
-        Long userId = user.getUserId();
         followRepository.deleteByFollowingId(user);
         followRepository.deleteByFollowerId(user);
-        usersRepository.deleteById(userId);
-
+        usersRepository.deleteById(user.getUserId());
     }
 
     @Override
     public Users beforeUpdateInformation(Long userId) {
-        Users user = usersRepository.findById(userId).orElseThrow();
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
 
         Users information = new Users();
-        information.setName(user.getUsername());
+        information.setName(user.getName());
         information.setNickname(user.getNickname());
         information.setDepartment(user.getDepartment());
         information.setGrade(user.getGrade());
 
         return information;
-
     }
 
     @Override
@@ -233,17 +182,17 @@ public class UsersServiceImpl implements UsersService {
         return usersRepository.existsByStudentId(emailCheckRequest.getStudentId());
     }
 
-    // 상대방 프로필 페이지 방문시 사용하는 함수
     @Override
     public Users userProfile(String studentId) {
-        return usersRepository.findByStudentId(studentId).orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        return usersRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
     }
 
     @Override
     public void resetPassword(UsersRequestDTO.UpdateUserPasswordDTO updateUserPasswordDTO, Long userId) {
-        Users user = usersRepository.findById(userId).orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
         user.setPassword(passwordEncoder.encode(updateUserPasswordDTO.getPassword()));
         usersRepository.save(user);
     }
-
 }
