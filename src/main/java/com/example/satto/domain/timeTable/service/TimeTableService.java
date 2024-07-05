@@ -295,7 +295,7 @@ public class TimeTableService {
         if (isRepresented.state()) {
             for (TimeTable tt : timeTables) {
                 if (tt.getSemesterYear().equals(timeTable.getSemesterYear()) && tt.getIsRepresented()) {
-                    throw new IllegalStateException("이미 해당 학기의 대표 시간표가 존재합니다.");
+                    tt.updateIsRepresented(false);
                 }
             }
         }
