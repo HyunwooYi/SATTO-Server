@@ -31,7 +31,7 @@ public class CurrentLectureRepositoryImpl implements CurrentLectureRepositoryCus
         BooleanBuilder builder = new BooleanBuilder();
 
         if (lectName != null && !lectName.isEmpty()) {
-            builder.and(lecture.lectName.in(lectName));
+            builder.and(lecture.lectName.contains(lectName));
         }
         if (grade != null && !grade.isEmpty()) {
             builder.and(lecture.grade.in(grade));
@@ -60,8 +60,10 @@ public class CurrentLectureRepositoryImpl implements CurrentLectureRepositoryCus
         if (art > 0) {
             builder.and(lecture.subjectType.eq("예술"));
         }
-        if (isCyber > 0) {
+        if (isCyber == 1) {
             builder.and(lecture.isCyber.eq("Y"));
+        } else if (isCyber == 2) {
+            builder.and(lecture.isCyber.eq("N"));
         }
         if (timeZone != null && !timeZone.isEmpty()) {
             for (String time : timeZone) {
