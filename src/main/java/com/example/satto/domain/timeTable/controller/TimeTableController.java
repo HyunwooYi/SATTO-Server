@@ -55,8 +55,9 @@ public class TimeTableController {
 
 
     @GetMapping("/{studentId}/timetable")
-    public  BaseResponse<List<TimeTableResponseDTO.timeTableListDTO>> getOtherTimeTableList(@PathVariable(name = "studentId") String studentId, @AuthenticationPrincipal Users users){
+    public  BaseResponse<List<TimeTableResponseDTO.timeTableListDTO>> getOtherTimeTableList(@PathVariable(name = "studentId") String studentId, @AuthenticationPrincipal Users users) {
         return BaseResponse.onSuccess(timeTableService.getOtherTimeTableList(studentId, users));
+    }
 
     @PatchMapping("/{timeTableId}")
     public BaseResponse<String> updateTimeTable(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody UpdateTimeTableLectRequestDTO updateDTO){
