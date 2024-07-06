@@ -88,29 +88,37 @@ public class TimeTableService {
 
         List<TimeTableResponseDTO.TimeTableLectureDTO> lectDetailList = new ArrayList<>();
         List<List<TimeTableResponseDTO.TimeTableLectureDTO>> timeTable = new ArrayList<>();
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> requiredTimeTable = new ArrayList<>();
         List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result;
 
         List<CurrentLecture> requiredLectList = new ArrayList<>();
         List<TimeTableResponseDTO.TimeTableLectureDTO> requiredLectDetailList = new ArrayList<>();
-
         majorLectDetailList = removeLecturesInImpossibleTimeZones(majorLectDetailList, createDTO.impossibleTimeZone());
+
+        int count = createDTO.majorCount();
 
         if(!createDTO.requiredLect().get(0).isEmpty()) {
 
             for (String lectCodeSection : createDTO.requiredLect()) {
-                requiredLectList.add(currentLectureRepository.findCurrentLectureByCodeSection(lectCodeSection));
+
+                CurrentLecture requiredLect = currentLectureRepository.findCurrentLectureByCodeSection(lectCodeSection);
+                requiredLectList.add(requiredLect);
+                if(!requiredLect.getCmpDiv().equals("1전심") && !requiredLect.getCmpDiv().equals("1전선")) {count++;}
+
             }
 
             requiredLectDetailList = TimeTableResponseDTO.TimeTableLectureDTO.fromList(requiredLectList);
-            generateCombinations(requiredLectDetailList, 0, lectDetailList, timeTable, requiredLectDetailList.size());
-            generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, createDTO.majorCount() + requiredLectDetailList.size());
+
+            generateCombinations(requiredLectDetailList, 0, lectDetailList, requiredTimeTable, requiredLectDetailList.size());
+
+            for(List<TimeTableResponseDTO.TimeTableLectureDTO> lect : requiredTimeTable){
+                generateCombinations(majorLectDetailList, 0, lect, timeTable, count);
+            }
+        }
+        else {
+            generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, createDTO.majorCount());
         }
 
-
-
-        //필수로 들어야할 강의 우선 조합
-
-        generateCombinations(majorLectDetailList, 0, lectDetailList, timeTable, createDTO.majorCount());
         result = TimeTableResponseDTO.EntireTimeTableResponseDTO.fromList(timeTable);
 
         List<Integer> toRemoveIndexes = new ArrayList<>();
@@ -156,7 +164,7 @@ public class TimeTableService {
 
     //전공 조합의 개수 계산
     public List<TimeTableResponseDTO.MajorCombinationResponseDTO> calculateMajorCombinations(List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result) {
-        Map<Set<TimeTableResponseDTO.LectureCombination>, Integer> combinationCounts = new HashMap<>();
+        Set<Set<TimeTableResponseDTO.LectureCombination>> uniqueCombinations = new HashSet<>();
 
         for (TimeTableResponseDTO.EntireTimeTableResponseDTO data : result) {
             Set<TimeTableResponseDTO.LectureCombination> sbjCombinations = data.timeTable().stream()
@@ -164,14 +172,15 @@ public class TimeTableService {
                     .map(lecture -> new TimeTableResponseDTO.LectureCombination(lecture.lectName(), lecture.code()))
                     .collect(Collectors.toSet());
 
-            combinationCounts.merge(sbjCombinations, 1, Integer::sum);
+            uniqueCombinations.add(sbjCombinations);
         }
 
         // 중복되지 않는 조합만 리스트로 변환
-        return combinationCounts.keySet().stream()
+        return uniqueCombinations.stream()
                 .map(sbjCombinations -> new TimeTableResponseDTO.MajorCombinationResponseDTO(sbjCombinations))
                 .collect(Collectors.toList());
     }
+
 
     public List<TimeTableResponseDTO.EntireTimeTableResponseDTO> createTimeTable(EntireTimeTableRequestDTO createDTO) {
 
@@ -193,6 +202,7 @@ public class TimeTableService {
 
 
         List<TimeTableResponseDTO.TimeTableLectureDTO> lectDetailList = new ArrayList<>();
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> requiredTimeTable = new ArrayList<>();
         List<List<TimeTableResponseDTO.TimeTableLectureDTO>> majorTimeTable = new ArrayList<>();
         List<List<TimeTableResponseDTO.TimeTableLectureDTO>> timeTable = new ArrayList<>();
         List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result;
@@ -205,19 +215,30 @@ public class TimeTableService {
 //        List<CurrentLectureResponseDTO> randomList = entireLectList.subList(0,10);
         List<CurrentLecture> requiredLectList = new ArrayList<>();
         List<TimeTableResponseDTO.TimeTableLectureDTO> requiredLectDetailList = new ArrayList<>();
+
+        int count = createDTO.majorCount();
+
         if(!createDTO.requiredLect().get(0).isEmpty()) {
-            for (String lect : createDTO.requiredLect()) {
-                requiredLectList.add(currentLectureRepository.findCurrentLectureByCodeSection(lect));
+
+            for (String lectCodeSection : createDTO.requiredLect()) {
+
+                CurrentLecture requiredLect = currentLectureRepository.findCurrentLectureByCodeSection(lectCodeSection);
+                requiredLectList.add(requiredLect);
+                if(!requiredLect.getCmpDiv().equals("1전심") && !requiredLect.getCmpDiv().equals("1전선")) {count++;}
+
             }
 
             requiredLectDetailList = TimeTableResponseDTO.TimeTableLectureDTO.fromList(requiredLectList);
 
-            //필수로 들어야할 강의 우선 조합
-            generateCombinations(requiredLectDetailList, 0, lectDetailList, majorTimeTable, requiredLectDetailList.size());
-            generateCombinations(majorLectDetailList, 0, lectDetailList, majorTimeTable, createDTO.majorCount() + requiredLectDetailList.size());
-        }
-        generateCombinations(majorLectDetailList, 0, lectDetailList, majorTimeTable, createDTO.majorCount());
+            generateCombinations(requiredLectDetailList, 0, lectDetailList, requiredTimeTable, requiredLectDetailList.size());
 
+            for(List<TimeTableResponseDTO.TimeTableLectureDTO> lect : requiredTimeTable){
+                generateCombinations(majorLectDetailList, 0, lect, majorTimeTable, count);
+            }
+        }
+        else {
+            generateCombinations(majorLectDetailList, 0, lectDetailList, majorTimeTable, createDTO.majorCount());
+        }
 
         for(List<TimeTableResponseDTO.TimeTableLectureDTO> lect : majorTimeTable){
             generateCombinations1212(entireLectList, 0, lect, timeTable, createDTO.GPA()-createDTO.cyberCount()*3);
