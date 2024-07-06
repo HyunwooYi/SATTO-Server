@@ -1,7 +1,6 @@
 package com.example.satto.domain.timeTable.controller;
 
 import com.example.satto.domain.timeTable.dto.*;
-import com.example.satto.domain.timeTable.entity.TimeTable;
 import com.example.satto.domain.timeTable.service.TimeTableService;
 import com.example.satto.domain.timeTableLecture.service.TimeTableLectureService;
 import com.example.satto.domain.users.entity.Users;
@@ -54,13 +53,20 @@ public class TimeTableController {
         return BaseResponse.onSuccess(timeTableService.getTimeTable(timeTableId));
     }
 
+    @PatchMapping("/{timeTableId}")
+    public BaseResponse<String> updateTimeTable(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody UpdateTimeTableLectRequestDTO updateDTO){
+        timeTableLectureService.deleteAll(timeTableId);
+        timeTableLectureService.addLect(updateDTO.codeSectionList(),timeTableId);
+        return BaseResponse.onSuccess("수정되었습니다");
+    }
+
     @PatchMapping("/{timeTableId}/private")
-    public BaseResponse<String> updateTimeTableIsPublic(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody updateTimeTableRequestDTO isPublic){
+    public BaseResponse<String> updateTimeTableIsPublic(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody UpdateTimeTableRequestDTO isPublic){
         timeTableService.updateTimeTableIsPublic(timeTableId, isPublic);
         return BaseResponse.onSuccess("수정되었습니다");
     }
     @PatchMapping("/{timeTableId}/represent")
-    public BaseResponse<String> updateTimeTableIsRepresent(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody updateTimeTableRequestDTO isRepresent, @AuthenticationPrincipal Users users){
+    public BaseResponse<String> updateTimeTableIsRepresent(@PathVariable(name = "timeTableId") Long timeTableId, @RequestBody UpdateTimeTableRequestDTO isRepresent, @AuthenticationPrincipal Users users){
         timeTableService.updateTimeTableIsRepresented(timeTableId, isRepresent, users);
         return BaseResponse.onSuccess("수정되었습니다");
     }
