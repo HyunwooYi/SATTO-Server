@@ -53,7 +53,7 @@ public class TimeTableController {
         return BaseResponse.onSuccess(timeTableService.getTimeTableList(users));
     }
 
-    @GetMapping("/{timetableId}")
+    @GetMapping("/{timeTableId}")
     public BaseResponse<TimeTableResponseDTO.SelectTimeTableResponseDTO> getTimeTable(@PathVariable(name = "timeTableId") Long timeTableId){
         return BaseResponse.onSuccess(timeTableService.getTimeTable(timeTableId));
     }
