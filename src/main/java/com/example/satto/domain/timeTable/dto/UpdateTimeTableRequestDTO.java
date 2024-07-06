@@ -1,6 +1,6 @@
 package com.example.satto.domain.timeTable.dto;
 
-public record updateTimeTableRequestDTO(
+public record UpdateTimeTableRequestDTO(
         boolean state
 ) {
 }

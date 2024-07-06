@@ -1,7 +1,5 @@
 package com.example.satto.domain.timeTable.service;
 
-import com.example.satto.domain.currentLecture.converter.CurrentLectureConverter;
-import com.example.satto.domain.currentLecture.dto.CurrentLectureResponseDTO;
 import com.example.satto.domain.currentLecture.entity.CurrentLecture;
 import com.example.satto.domain.currentLecture.repository.CurrentLectureRepository;
 import com.example.satto.domain.follow.repository.FollowRepository;
@@ -305,6 +303,7 @@ public class TimeTableService {
         return TimeTableResponseDTO.SelectTimeTableResponseDTO.from(timeTableLectures,timeTable);
     }
 
+
     public List<TimeTableResponseDTO.timeTableListDTO> getOtherTimeTableList(String studentId,Users users){
 
         Users target = usersRepository.findByStudentId(studentId).orElseThrow();
@@ -321,12 +320,13 @@ public class TimeTableService {
     }
 
     public void updateTimeTableIsPublic(Long timeTableId, updateTimeTableRequestDTO isPublic){
+
         TimeTable timeTable = timeTableRepository.findById(timeTableId).orElseThrow();
         timeTable.updateIsPublic(isPublic.state());
         timeTableRepository.save(timeTable);
     }
 
-    public void updateTimeTableIsRepresented(Long timeTableId, updateTimeTableRequestDTO isRepresented, Users users){
+    public void updateTimeTableIsRepresented(Long timeTableId, UpdateTimeTableRequestDTO isRepresented, Users users){
         TimeTable timeTable = timeTableRepository.findById(timeTableId).orElseThrow();
         List<TimeTable> timeTables = timeTableRepository.findAllByUserId(users.getUserId());
 
