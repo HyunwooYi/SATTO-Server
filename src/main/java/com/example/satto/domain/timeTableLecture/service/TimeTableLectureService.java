@@ -33,4 +33,8 @@ public class TimeTableLectureService {
         TimeTableLecture timeTableLecture = timeTableLectureRepository.findTimeTableLectureByTimeTableIdAndCodeSection(timeTableId, codeSection);
         timeTableLectureRepository.delete(timeTableLecture);
     }
+
+    public void deleteAll(Long timeTableId){
+        timeTableLectureRepository.deleteByTimeTableId(timeTableId);
+    }
 }
