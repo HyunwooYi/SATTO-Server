@@ -319,7 +319,7 @@ public class TimeTableService {
         return TimeTableResponseDTO.timeTableListDTO.fromList(timeTables);
     }
 
-    public void updateTimeTableIsPublic(Long timeTableId, updateTimeTableRequestDTO isPublic){
+    public void updateTimeTableIsPublic(Long timeTableId, UpdateTimeTableRequestDTO isPublic){
 
         TimeTable timeTable = timeTableRepository.findById(timeTableId).orElseThrow();
         timeTable.updateIsPublic(isPublic.state());
