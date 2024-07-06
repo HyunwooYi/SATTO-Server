@@ -254,6 +254,78 @@ public class TimeTableService {
 
         return  result;
     }
+    public List<TimeTableResponseDTO.EntireTimeTableResponseDTO> createTimeTableRaw(EntireTimeTableRequestDTO createDTO) {
+
+        List<CurrentLecture> entireLect = currentLectureRepository.findLectByCmpDiv("교선");
+        List<TimeTableResponseDTO.TimeTableLectureDTO> entireLectList = TimeTableResponseDTO.TimeTableLectureDTO.fromList(entireLect);
+
+        Set<String> majorSet = new HashSet<>();
+        List<CurrentLecture> majorList = new ArrayList<>();
+
+        for (List<String> majors : createDTO.majorList()){
+            majorSet.addAll(majors);
+        }
+
+        for (String majorName : majorSet){
+            majorList.addAll(currentLectureRepository.findCurrentLecturesByCode(majorName));
+        }
+
+        List<TimeTableResponseDTO.TimeTableLectureDTO> majorLectDetailList = TimeTableResponseDTO.TimeTableLectureDTO.fromList(majorList);
+
+
+        List<TimeTableResponseDTO.TimeTableLectureDTO> lectDetailList = new ArrayList<>();
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> requiredTimeTable = new ArrayList<>();
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> majorTimeTable = new ArrayList<>();
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> timeTable = new ArrayList<>();
+        List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result;
+
+        majorLectDetailList = removeLecturesInImpossibleTimeZones(majorLectDetailList, createDTO.impossibleTimeZone());
+        entireLectList = removeLecturesInImpossibleTimeZones(entireLectList, createDTO.impossibleTimeZone());
+
+        //임의 교양 리스트 생성
+//        Collections.shuffle(entireLectList);
+//        List<CurrentLectureResponseDTO> randomList = entireLectList.subList(0,10);
+        List<CurrentLecture> requiredLectList = new ArrayList<>();
+        List<TimeTableResponseDTO.TimeTableLectureDTO> requiredLectDetailList = new ArrayList<>();
+
+        int count = createDTO.majorCount();
+
+        if(!createDTO.requiredLect().get(0).isEmpty()) {
+
+            for (String lectCodeSection : createDTO.requiredLect()) {
+
+                CurrentLecture requiredLect = currentLectureRepository.findCurrentLectureByCodeSection(lectCodeSection);
+                requiredLectList.add(requiredLect);
+                if(!requiredLect.getCmpDiv().equals("1전심") && !requiredLect.getCmpDiv().equals("1전선")) {count++;}
+
+            }
+
+            requiredLectDetailList = TimeTableResponseDTO.TimeTableLectureDTO.fromList(requiredLectList);
+
+            generateCombinations(requiredLectDetailList, 0, lectDetailList, requiredTimeTable, requiredLectDetailList.size());
+
+            for(List<TimeTableResponseDTO.TimeTableLectureDTO> lect : requiredTimeTable){
+                generateCombinations(majorLectDetailList, 0, lect, majorTimeTable, count);
+            }
+        }
+        else {
+            generateCombinations(majorLectDetailList, 0, lectDetailList, majorTimeTable, createDTO.majorCount());
+        }
+
+        for(List<TimeTableResponseDTO.TimeTableLectureDTO> lect : majorTimeTable){
+            generateCombinations1212(entireLectList, 0, lect, timeTable, createDTO.GPA()-createDTO.cyberCount()*3);
+        }
+
+        result = TimeTableResponseDTO.EntireTimeTableResponseDTO.fromList(timeTable);
+//        optimizationTimeTable(result);
+//        optimizationTimeTable2(result);
+//        optimizationTimeTable3(result);
+//        optimizationTimeTable4(result);
+//        optimizationTimeTable5(result);
+//        optimizationTimeTable6(result);
+
+        return  result;
+    }
 
     public Long createTimeTable(TimeTableSelectRequestDTO selectRequestDTO, Users users){
 

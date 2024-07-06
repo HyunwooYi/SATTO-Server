@@ -30,6 +30,11 @@ public class TimeTableController {
         List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result = timeTableService.createTimeTable(createDTO);
         return BaseResponse.onSuccess(result);
     }
+    @PostMapping("/auto/raw")
+    public BaseResponse<List<TimeTableResponseDTO.EntireTimeTableResponseDTO>> createTimeTableRaw(@RequestBody EntireTimeTableRequestDTO createDTO, @AuthenticationPrincipal Users users){
+        List<TimeTableResponseDTO.EntireTimeTableResponseDTO> result = timeTableService.createTimeTableRaw(createDTO);
+        return BaseResponse.onSuccess(result);
+    }
 
     @PostMapping("/select")
     public BaseResponse<String> selectTimeTable(@RequestBody TimeTableSelectRequestDTO selectDTO, @AuthenticationPrincipal Users users){
