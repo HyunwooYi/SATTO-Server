@@ -4,6 +4,7 @@ import com.example.satto.domain.currentLecture.converter.CurrentLectureConverter
 import com.example.satto.domain.currentLecture.dto.CurrentLectureResponseDTO;
 import com.example.satto.domain.currentLecture.entity.CurrentLecture;
 import com.example.satto.domain.currentLecture.repository.CurrentLectureRepository;
+import com.example.satto.domain.follow.repository.FollowRepository;
 import com.example.satto.domain.timeTable.dto.*;
 import com.example.satto.domain.timeTable.entity.TimeTable;
 import com.example.satto.domain.timeTable.repository.TimeTableRepository;
@@ -25,6 +26,7 @@ public class TimeTableService {
     private final TimeTableRepository timeTableRepository;
     private final UsersRepository usersRepository;
     private final TimeTableLectureRepository timeTableLectureRepository;
+    private final FollowRepository followRepository;
 
 
     //강의 시간 충돌 검사
@@ -301,6 +303,21 @@ public class TimeTableService {
         }
         List<TimeTableResponseDTO.TimeTableLectureDTO> timeTableLectures = TimeTableResponseDTO.TimeTableLectureDTO.fromList(currentLectures);
         return TimeTableResponseDTO.SelectTimeTableResponseDTO.from(timeTableLectures,timeTable);
+    }
+
+    public List<TimeTableResponseDTO.timeTableListDTO> getOtherTimeTableList(String studentId,Users users){
+
+        Users target = usersRepository.findByStudentId(studentId).orElseThrow();
+        List<TimeTable> timeTables = new ArrayList<>();
+
+        if(!target.isPublic()){
+            if(!followRepository.existsByFollowerIdStudentIdAndFollowingIdStudentId(users.getStudentId(), studentId)){
+                throw new IllegalStateException("볼 수 있는 시간표가 존재하지 않습니다.");
+            }
+        }
+        timeTables = timeTableRepository.findPublicTimeTableByStudentId(studentId);
+
+        return TimeTableResponseDTO.timeTableListDTO.fromList(timeTables);
     }
 
     public void updateTimeTableIsPublic(Long timeTableId, updateTimeTableRequestDTO isPublic){

@@ -49,9 +49,14 @@ public class TimeTableController {
         return BaseResponse.onSuccess(timeTableService.getTimeTableList(users));
     }
 
-    @GetMapping("/{timeTableId}")
+    @GetMapping("/{timetableId}")
     public BaseResponse<TimeTableResponseDTO.SelectTimeTableResponseDTO> getTimeTable(@PathVariable(name = "timeTableId") Long timeTableId){
         return BaseResponse.onSuccess(timeTableService.getTimeTable(timeTableId));
+    }
+
+    @GetMapping("/{studentId}/timetable")
+    public  BaseResponse<List<TimeTableResponseDTO.timeTableListDTO>> getOtherTimeTableList(@PathVariable(name = "studentId") String studentId, @AuthenticationPrincipal Users users){
+        return BaseResponse.onSuccess(timeTableService.getOtherTimeTableList(studentId, users));
     }
 
     @PatchMapping("/{timeTableId}/private")
