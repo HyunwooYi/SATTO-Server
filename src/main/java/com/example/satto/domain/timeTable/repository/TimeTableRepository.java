@@ -18,6 +18,9 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     @Query("select t from TimeTable t where t.users.studentId = :studentId and t.isPublic = true ")
     List<TimeTable> findPublicTimeTableByStudentId(@Param("studentId") String studentId);
 
+    @Query("select t from TimeTable t where t.users.studentId = :studentId")
+    List<TimeTable> findTimeTableByStudentId(@Param("studentId") String studentId);
+
     @Query("SELECT t FROM TimeTable t WHERE t.users.userId = :userId AND t.isRepresented = true ORDER BY t.createdAt DESC")
     TimeTable findLatestRepresentedTimeTableByUserId(@Param("userId") Long userId);
 }
