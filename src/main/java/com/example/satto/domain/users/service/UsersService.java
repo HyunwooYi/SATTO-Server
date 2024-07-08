@@ -5,6 +5,9 @@ import com.example.satto.domain.users.dto.UsersRequestDTO;
 import com.example.satto.domain.users.entity.Users;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.List;
+import java.util.Map;
+
 public interface UsersService {
 
     UserDetailsService userDetailsService();
@@ -41,4 +44,9 @@ public interface UsersService {
     Users userProfile(String studentId);
 
     void resetPassword(UsersRequestDTO.UpdateUserPasswordDTO updateUserPasswordDTO, Long userId);
+
+
+    List<Map<String, String>> searchUserByStudentId(String query);
+
+    List<Map<String, String>> searchUserByName(String query);
 }

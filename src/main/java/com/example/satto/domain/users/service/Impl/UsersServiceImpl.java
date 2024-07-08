@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 
 @Service
@@ -70,7 +71,8 @@ public class UsersServiceImpl implements UsersService {
         userMap.put("department", user.getDepartment());
         userMap.put("grade", String.valueOf(user.getGrade()));
         userMap.put("isPublic", String.valueOf(user.isPublic()));
-        return userMap;    }
+        return userMap;
+    }
 
     @Override
     public List<String> followerListNum(String studentId) {
@@ -195,4 +197,29 @@ public class UsersServiceImpl implements UsersService {
         user.setPassword(passwordEncoder.encode(updateUserPasswordDTO.getPassword()));
         usersRepository.save(user);
     }
+
+    @Override
+    public List<Map<String, String>> searchUserByStudentId(String studentId) {
+        List<Users> pre = usersRepository.findByStudentIdStartsWith(studentId);
+
+        List<Map<String, String>> afterMap = new ArrayList<>();
+        for (Users user : pre) {
+
+            afterMap.add(convertFollowToMap(user));
+        }
+        return afterMap;
+    }
+
+    @Override
+    public List<Map<String, String>> searchUserByName(String name) {
+        List<Users> pre = usersRepository.findByNameStartsWith(name);
+
+        List<Map<String, String>> afterMap = new ArrayList<>();
+        for (Users user : pre) {
+
+            afterMap.add(convertFollowToMap(user));
+        }
+        return afterMap;
+    }
+
 }

@@ -3,6 +3,9 @@ package com.example.satto.domain.users.converter;
 import com.example.satto.domain.users.dto.UsersResponseDTO;
 import com.example.satto.domain.users.entity.Users;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UsersConverter {
 
     public static UsersResponseDTO.UserPreviewDTO toUserPreviewDTO(Users user) {
@@ -52,5 +55,17 @@ public class UsersConverter {
                 .isPublic(user.isPublic())
                 .build();
     }
+
+//    public static Map<String, String> convertToMap(Users user) {
+//        Map<String, String> userMap = new HashMap<>();
+//        userMap.put("studentId", user.getStudentId());
+//        userMap.put("name", user.getName());
+//        userMap.put("nickname", user.getNickname());
+//        userMap.put("email", user.getEmail());
+//        userMap.put("department", user.getDepartment());
+//        userMap.put("grade", String.valueOf(user.getGrade()));
+//        userMap.put("isPublic", String.valueOf(user.isPublic()));
+//        return userMap;
+//    }
 
 }
