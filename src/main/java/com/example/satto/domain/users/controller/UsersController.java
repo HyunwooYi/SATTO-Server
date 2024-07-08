@@ -1,7 +1,6 @@
 package com.example.satto.domain.users.controller;
 
-import com.example.satto.s31.FileFolder;
-import com.example.satto.s31.FileService;
+//import com.example.satto.s31.FileService;
 import com.example.satto.domain.users.converter.UsersConverter;
 import com.example.satto.domain.users.dto.UsersRequestDTO;
 import com.example.satto.domain.users.dto.UsersResponseDTO;
@@ -12,10 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -24,7 +22,7 @@ import java.util.List;
 public class UsersController {
 
     private final UsersService usersService;
-    private final FileService fileService;
+//    private final FileService fileService;
 
     // email 중복 확인
     @Operation(summary = "email 중복 확인")
@@ -82,7 +80,6 @@ public class UsersController {
     @GetMapping("/inform")
     public BaseResponse<?> userInformation2(@AuthenticationPrincipal Users user) {
         Long userId = user.getUserId();
-        String userStudentId = user.getStudentId();
         Users users = usersService.userProfile(userId);
 
         return BaseResponse.onSuccess(UsersConverter.toUserInformation2(users));
@@ -140,6 +137,25 @@ public class UsersController {
         return BaseResponse.onSuccess("계정 탈퇴 완료");
     }
 
+    @Operation(summary = "유저 검색창", description = "search?query=이현우 or /search?query=2018 과 같은 형식으로 검색")
+    @GetMapping("/search")
+    public BaseResponse<List<Map<String, String>>> searchUsers(@RequestParam String query) {
+        // studentId와 name이 모두 제공되지 않았을 경우 예외 처리
+        if (query == null || query.isEmpty()) {
+            throw new IllegalArgumentException("Required parameter 'query' is not present.");
+        }
+
+        List<Map<String, String>> users;
+
+        // 입력 값이 숫자로 시작하면 studentId로 검색, 그렇지 않으면 name으로 검색
+        if (query.matches("^\\d+.*")) {
+            users = usersService.searchUserByStudentId(query);
+        } else {
+            users = usersService.searchUserByName(query);
+        }
+
+        return BaseResponse.onSuccess(users);
+    }
 
 
 }
