@@ -99,10 +99,16 @@ public class FollowServiceImpl implements FollowService {
     }
 
     private Follow createFollow(Users followerUser, Users followingUser) {
+        boolean userPresent = followingUser.isPublic();
         Follow follow = new Follow();
         follow.setFollowerId(followerUser);
         follow.setFollowingId(followingUser);
-        follow.setRequest(1);
+
+        if (!userPresent) {     // 팔로잉 대상인 유저가 비공개 계정일 때
+            follow.setRequest(1);
+        } else {                // 팔로잉 대상인 유저가 공개 계정일 때
+            follow.setRequest(2);
+        }
         return follow;
     }
 

@@ -22,14 +22,15 @@ public class FollowController {
     private final FollowService followService;
     private final UsersService usersService;
 
-    // 팔로우 요청
-    @Operation(summary = "팔로우 요청",
-            description = "상대방 userId를 입력하여 팔로우 요청을 보낸다.")
+    // 비공개 프로필 팔로우 요청
+    @Operation(summary = "팔로우 요청", description = "상대방 userId를 입력하여 팔로우 요청을 보낸다.")
     @PostMapping("/request/{followingId}")
     public BaseResponse<Object> followRequest(@PathVariable("followingId") String followingId, @AuthenticationPrincipal Users user) {
         String studentId = user.getStudentId();
         return followService.followRequest(followingId, studentId);
     }
+
+
 
     // 팔로우 요청 수락 대기 목록
     @Operation(summary = "팔로우 요청 수락 대기 목록")
