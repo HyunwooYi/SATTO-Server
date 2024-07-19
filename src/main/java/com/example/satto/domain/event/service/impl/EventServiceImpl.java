@@ -1,17 +1,14 @@
 package com.example.satto.domain.event.service.impl;
 
-import com.example.satto.domain.event.dto.EventCategoryListResponseDto;
-import com.example.satto.domain.event.dto.EventCategoryResponseDto;
-import com.example.satto.domain.event.dto.PhotoContestListResponseDto;
-import com.example.satto.domain.event.dto.PhotoContestResponseDto;
+import com.example.satto.domain.event.dto.*;
 import com.example.satto.domain.event.entity.Event;
-import com.example.satto.domain.event.entity.PhotoContest;
-import com.example.satto.domain.event.entity.PhotoContestDislike;
-import com.example.satto.domain.event.entity.PhotoContestLike;
-import com.example.satto.domain.event.repository.EventRepository;
-import com.example.satto.domain.event.repository.PhotoContestDislikeRepository;
-import com.example.satto.domain.event.repository.PhotoContestLikeRepository;
-import com.example.satto.domain.event.repository.PhotoContestRepository;
+import com.example.satto.domain.event.entity.photoContest.PhotoContest;
+import com.example.satto.domain.event.entity.photoContest.PhotoContestDislike;
+import com.example.satto.domain.event.entity.photoContest.PhotoContestLike;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContest;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContestDislike;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContestLike;
+import com.example.satto.domain.event.repository.*;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.domain.users.entity.Users;
 import com.example.satto.domain.users.repository.UsersRepository;
@@ -35,6 +32,9 @@ public class EventServiceImpl implements EventService {
     private final PhotoContestRepository photoContestRepository;
     private final PhotoContestLikeRepository photoContestLikeRepository;
     private final PhotoContestDislikeRepository photoContestDislikeRepository;
+    private final TimetableContestRepository timetableContestRepository;
+    private final TimetableContestLikeRepository timetableContestLikeRepository;
+    private final TimetableContestDislikeRepository timetableContestDislikeRepository;
 
     // 이벤트 카테고리 목록 조회
     @Transactional(readOnly = true)
@@ -44,6 +44,7 @@ public class EventServiceImpl implements EventService {
         for (Event event : eventList) {
             Long participantsCount = photoContestRepository.countByEvent(event);
             EventCategoryResponseDto eventCategoryResponseDto = EventCategoryResponseDto.builder()
+                    .eventId(event.getEventId())
                     .category(event.getCategory())
                     .participantsCount(participantsCount)
                     .startWhen(event.getStartWhen())
@@ -64,8 +65,10 @@ public class EventServiceImpl implements EventService {
         for (PhotoContest photoContest : photoContestList) {
             Long likeCount = photoContestLikeRepository.countByPhotoContest(photoContest);
             Long dislikeCount = photoContestDislikeRepository.countByPhotoContest(photoContest);
-            String name = userRepository.findByPhotoContest(photoContest).getName();
+            String name = photoContest.getUser().getName();
             PhotoContestResponseDto.builder()
+                    .photoContestId(photoContest.getPhotoContestId())
+                    .name(name)
                     .likeCount(likeCount)
                     .dislikeCount(dislikeCount)
                     .photo(photoContest.getPhotoImg())
@@ -113,4 +116,70 @@ public class EventServiceImpl implements EventService {
             return "싫어요 부여";
         }
     }
+
+    @Override
+    public String deletePhotoContest(Long photoContestId, Users user) {
+        PhotoContest photoContest = photoContestRepository.findById(photoContestId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_PHOTO));
+        if (photoContest.getUser().equals(user)) {
+            photoContestRepository.delete(photoContest);
+            return "삭제되었습니다.";
+        } else {
+            throw new GeneralException(ErrorStatus._BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public TimetableContestListResponseDto getTimetableContestParticipants() {
+        List<TimetableContestResponseDto> timetableContestResponseDtoList = eventRepository.findAllTimetableContest();
+
+        return TimetableContestListResponseDto.builder()
+                .timetableContestResponseDtoList(timetableContestResponseDtoList)
+                .build();
+    }
+
+    @Override
+    public String likeTimetableContest(Long timetableContestId, Users user) {
+        TimetableContest timetableContest = timetableContestRepository.findById(timetableContestId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_EVENT));
+
+        Optional<TimetableContestLike> timetableContestLike = timetableContestLikeRepository.findByUserAndTimetableContest(user, timetableContest);
+
+        if(timetableContestLike.isPresent()) {
+            timetableContestLikeRepository.delete(timetableContestLike.get());
+            return "좋아요 취소";
+        }
+        else {
+            timetableContestLikeRepository.saveAndFlush(new TimetableContestLike(user, timetableContest));
+            return "좋아요 부여";
+        }
+    }
+
+    @Override
+    public String dislikeTimetableContest(Long timetableContestId, Users user) {
+        TimetableContest timetableContest = timetableContestRepository.findById(timetableContestId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_EVENT));
+
+        Optional<TimetableContestDislike> timetableContestDislike = timetableContestDislikeRepository.findByUserAndTimetableContest(user, timetableContest);
+
+        if(timetableContestDislike.isPresent()) {
+            timetableContestDislikeRepository.delete(timetableContestDislike.get());
+            return "싫어요 취소";
+        }
+        else {
+            timetableContestDislikeRepository.saveAndFlush(new TimetableContestDislike(user, timetableContest));
+            return "싫어요 부여";
+        }
+    }
+
+    @Override
+    public String deleteTimetableContest(Long timetableContestId, Users user) {
+        return null;
+    }
+
+//    @Override
+//    public PhotoContestResponseDto joinPhotoContest(MultipartFile multipartFile, Users user) {
+//
+//
+//    }
 }

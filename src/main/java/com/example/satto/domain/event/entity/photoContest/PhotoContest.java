@@ -1,5 +1,6 @@
-package com.example.satto.domain.event.entity;
+package com.example.satto.domain.event.entity.photoContest;
 
+import com.example.satto.domain.event.entity.Event;
 import com.example.satto.domain.users.entity.Users;
 import com.example.satto.global.common.BaseEntity;
 import jakarta.persistence.*;

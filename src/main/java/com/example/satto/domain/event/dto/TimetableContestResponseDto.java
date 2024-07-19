@@ -1,12 +1,9 @@
 package com.example.satto.domain.event.dto;
 
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 
-@Builder
-public record PhotoContestResponseDto(
-        Long photoContestId,
+public record TimetableContestResponseDto(
+        Long timetableContestId,
         String name,
         String photo,
         Long likeCount,
