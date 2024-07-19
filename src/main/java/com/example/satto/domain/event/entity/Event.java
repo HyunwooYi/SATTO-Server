@@ -1,5 +1,7 @@
 package com.example.satto.domain.event.entity;
 
+import com.example.satto.domain.event.entity.photoContest.PhotoContest;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,5 +23,8 @@ public class Event {
 
     @OneToOne(mappedBy = "event")
     private PhotoContest photoContest;
+
+    @OneToOne(mappedBy = "event")
+    private TimetableContest timetableContest;
 
 }

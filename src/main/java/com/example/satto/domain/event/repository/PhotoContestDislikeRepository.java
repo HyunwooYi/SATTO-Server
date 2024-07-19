@@ -1,7 +1,7 @@
 package com.example.satto.domain.event.repository;
 
-import com.example.satto.domain.event.entity.PhotoContest;
-import com.example.satto.domain.event.entity.PhotoContestDislike;
+import com.example.satto.domain.event.entity.photoContest.PhotoContest;
+import com.example.satto.domain.event.entity.photoContest.PhotoContestDislike;
 import com.example.satto.domain.users.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record EventCategoryResponseDto(
+        Long eventId,
         String category,
         Long participantsCount,
         LocalDateTime startWhen,

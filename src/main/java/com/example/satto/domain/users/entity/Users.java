@@ -1,9 +1,12 @@
 package com.example.satto.domain.users.entity;
 
 import com.example.satto.domain.course.entity.Course;
-import com.example.satto.domain.event.entity.PhotoContest;
-import com.example.satto.domain.event.entity.PhotoContestDislike;
-import com.example.satto.domain.event.entity.PhotoContestLike;
+import com.example.satto.domain.event.entity.photoContest.PhotoContest;
+import com.example.satto.domain.event.entity.photoContest.PhotoContestDislike;
+import com.example.satto.domain.event.entity.photoContest.PhotoContestLike;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContest;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContestDislike;
+import com.example.satto.domain.event.entity.timetableContest.TimetableContestLike;
 import com.example.satto.domain.follow.entity.Follow;
 import com.example.satto.domain.users.Role;
 import com.example.satto.global.common.BaseEntity;
@@ -79,17 +82,29 @@ public class Users extends BaseEntity implements UserDetails {
 //    @OneToMany(mappedBy = "userId")
 //    private List<Timetable> timetableList = new ArrayList<>();
 
-    // 이벤트 학교사진콘테스트
+    // 이벤트 학교 사진 콘테스트
     @OneToOne(mappedBy = "user")
     private PhotoContest photoContest;
 
-    // 시간표 좋아요
-    @OneToMany(mappedBy = "user")
-    private List<PhotoContestLike> likeList = new ArrayList<>();
+    // 이벤트 시간표 경진 대회
+    @OneToOne(mappedBy = "user")
+    private TimetableContest timetableContest;
 
-    // 시간표 싫어요
+    // 사진 콘테스트 좋아요
     @OneToMany(mappedBy = "user")
-    private List<PhotoContestDislike> dislikeList = new ArrayList<>();
+    private List<PhotoContestLike> photoContestLikeList = new ArrayList<>();
+
+    // 사진 콘테스트 싫어요
+    @OneToMany(mappedBy = "user")
+    private List<PhotoContestDislike> photoContestDislikeList = new ArrayList<>();
+
+    // 시간표 경진 대회 좋아요
+    @OneToMany(mappedBy = "user")
+    private List<TimetableContestLike> timetableContestLikeList = new ArrayList<>();
+
+    // 시간표 경진 대회 싫어요
+    @OneToMany(mappedBy = "user")
+    private List<TimetableContestDislike> timetableContestDislikeList = new ArrayList<>();
 
     // 수강한 강의 목록
     @OneToMany(mappedBy = "user")

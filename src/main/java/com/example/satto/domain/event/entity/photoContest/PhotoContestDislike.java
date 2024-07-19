@@ -1,4 +1,4 @@
-package com.example.satto.domain.event.entity;
+package com.example.satto.domain.event.entity.photoContest;
 
 import com.example.satto.domain.users.entity.Users;
 import jakarta.persistence.*;
@@ -9,10 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Getter
-public class PhotoContestLike {
+public class PhotoContestDislike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long dislikeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -22,7 +22,7 @@ public class PhotoContestLike {
     @JoinColumn(name = "photo_contest_id")
     private PhotoContest photoContest;
 
-    public PhotoContestLike(Users user, PhotoContest photoContest) {
+    public PhotoContestDislike(Users user, PhotoContest photoContest) {
         this.user = user;
         this.photoContest = photoContest;
     }
