@@ -11,16 +11,21 @@ import com.example.satto.domain.event.entity.timetableContest.TimetableContestLi
 import com.example.satto.domain.event.repository.*;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.domain.users.entity.Users;
-import com.example.satto.domain.users.repository.UsersRepository;
 import com.example.satto.global.common.code.status.ErrorStatus;
 import com.example.satto.global.common.exception.GeneralException;
+import com.example.satto.s3.S3Manager;
+import com.example.satto.s3.uuid.Uuid;
+import com.example.satto.s3.uuid.UuidRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +33,14 @@ import java.util.Optional;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
-    private final UsersRepository userRepository;
     private final PhotoContestRepository photoContestRepository;
     private final PhotoContestLikeRepository photoContestLikeRepository;
     private final PhotoContestDislikeRepository photoContestDislikeRepository;
     private final TimetableContestRepository timetableContestRepository;
     private final TimetableContestLikeRepository timetableContestLikeRepository;
     private final TimetableContestDislikeRepository timetableContestDislikeRepository;
+    private final UuidRepository uuidRepository;
+    private final S3Manager s3Manager;
 
     // 이벤트 카테고리 목록 조회
     @Transactional(readOnly = true)
@@ -67,7 +73,6 @@ public class EventServiceImpl implements EventService {
             Long dislikeCount = photoContestDislikeRepository.countByPhotoContest(photoContest);
             String name = photoContest.getUser().getName();
             PhotoContestResponseDto.builder()
-                    .photoContestId(photoContest.getPhotoContestId())
                     .name(name)
                     .likeCount(likeCount)
                     .dislikeCount(dislikeCount)
@@ -174,12 +179,72 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public String deleteTimetableContest(Long timetableContestId, Users user) {
-        return null;
+        TimetableContest timetableContest = timetableContestRepository.findById(timetableContestId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_PHOTO));
+        if (timetableContest.getUser().equals(user)) {
+            timetableContestRepository.delete(timetableContest);
+            return "삭제되었습니다.";
+        } else {
+            throw new GeneralException(ErrorStatus._BAD_REQUEST);
+        }
     }
 
-//    @Override
-//    public PhotoContestResponseDto joinPhotoContest(MultipartFile multipartFile, Users user) {
-//
-//
-//    }
+    @Override
+    public TimetableContestResponseDto.SavedTimetableContest joinTimetableContest(MultipartFile file, Users user) {
+        String url = null;
+        Event event = eventRepository.findByCategory("TimetableContest")
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_EVENT));
+
+        if (file != null && !file.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            url = s3Manager.uploadFile(s3Manager.generateImage(savedUuid), file);
+            TimetableContest newTimetableContest = TimetableContest.builder()
+                    .photoImg(url)
+                    .user(user)
+                    .event(event)
+                    .build();
+            timetableContestRepository.save(newTimetableContest);
+        }
+        return TimetableContestResponseDto.SavedTimetableContest.builder()
+                .name(user.getName())
+                .photo(url)
+                .likeCount(0L)
+                .dislikeCount(0L)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    @Override
+    public PhotoContestResponseDto.SavedPhotoContest joinPhotoContest(MultipartFile file, Users user) {
+        String url = null;
+        Event event = eventRepository.findByCategory("PhotoContest")
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_EVENT));
+
+        if (file != null && !file.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            url = s3Manager.uploadFile(s3Manager.generateImage(savedUuid), file);
+            PhotoContest newPhotoContest = PhotoContest.builder()
+                    .photoImg(url)
+                    .user(user)
+                    .event(event)
+                    .build();
+            photoContestRepository.save(newPhotoContest);
+        }
+        return PhotoContestResponseDto.SavedPhotoContest.builder()
+                .name(user.getName())
+                .photo(url)
+                .likeCount(0L)
+                .dislikeCount(0L)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
 }

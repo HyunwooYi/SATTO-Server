@@ -58,12 +58,12 @@ public class PhotoContestController {
         return BaseResponse.onSuccess(eventService.deletePhotoContest(photoContestId, user));
     }
 
-//    @Operation(method = "POST", summary = "사진 콘테스트: 사진 업로드", description = "사진 콘테스트 참여")
-//    @PostMapping(consumes = "multipart/form-data")
-//    public BaseResponse<PhotoContestResponseDto> joinPhotoContest(
-//            @RequestParam("file")MultipartFile multipartFile,
-//            @AuthenticationPrincipal Users user
-//            ) throws IOException {
-//        return BaseResponse.onSuccess(eventService.joinPhotoContest(multipartFile, user));
-//    }
+    @Operation(method = "POST", summary = "사진 콘테스트: 사진 업로드", description = "사진 콘테스트 참여")
+    @PostMapping(consumes = "multipart/form-data")
+    public BaseResponse<PhotoContestResponseDto.SavedPhotoContest> joinPhotoContest(
+            @RequestParam("file")MultipartFile multipartFile,
+            @AuthenticationPrincipal Users user
+            ) throws IOException {
+        return BaseResponse.onSuccess(eventService.joinPhotoContest(multipartFile, user));
+    }
 }

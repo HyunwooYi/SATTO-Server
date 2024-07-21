@@ -32,7 +32,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Event 에러,
     _NOT_FOUND_EVENT(HttpStatus.NOT_FOUND, "EVENT400", "해당 이벤트가 존재하지 않습니다."),
-    _NOT_FOUND_PHOTO(HttpStatus.NOT_FOUND, "EVENT401", "사진 콘테스트에 참여한 상태가 아닙니다."),
+    _NOT_FOUND_PHOTO(HttpStatus.NOT_FOUND, "EVENT401", "해당 사진을 찾을 수 없습니다."),
 
     // Security 에러,
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "SEC4001", "잘못된 형식의 토큰입니다."),

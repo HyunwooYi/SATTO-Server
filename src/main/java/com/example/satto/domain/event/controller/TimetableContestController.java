@@ -1,7 +1,9 @@
 package com.example.satto.domain.event.controller;
 
 import com.example.satto.domain.event.dto.PhotoContestListResponseDto;
+import com.example.satto.domain.event.dto.PhotoContestResponseDto;
 import com.example.satto.domain.event.dto.TimetableContestListResponseDto;
+import com.example.satto.domain.event.dto.TimetableContestResponseDto;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.domain.users.entity.Users;
 import com.example.satto.global.common.BaseResponse;
@@ -10,6 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,5 +57,13 @@ public class TimetableContestController {
             @AuthenticationPrincipal Users user
     ) {
         return BaseResponse.onSuccess(eventService.deleteTimetableContest(timetableContestId, user));
+    }
+    @Operation(method = "POST", summary = "시간표 경진 대회: 사진 업로드", description = "시간표 경진 대회 참여")
+    @PostMapping(consumes = "multipart/form-data")
+    public BaseResponse<TimetableContestResponseDto.SavedTimetableContest> joinTimetableContest(
+            @RequestParam("file") MultipartFile multipartFile,
+            @AuthenticationPrincipal Users user
+    ) throws IOException {
+        return BaseResponse.onSuccess(eventService.joinTimetableContest(multipartFile, user));
     }
 }
