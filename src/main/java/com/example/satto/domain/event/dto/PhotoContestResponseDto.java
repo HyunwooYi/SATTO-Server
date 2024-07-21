@@ -14,4 +14,13 @@ public record PhotoContestResponseDto(
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
+    @Builder
+    public record SavedPhotoContest(
+            String name,
+            String photo,
+            Long likeCount,
+            Long dislikeCount,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {}
 }

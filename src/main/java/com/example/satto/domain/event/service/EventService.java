@@ -26,7 +26,7 @@ public interface EventService {
 
     String deleteTimetableContest(Long timetableContestId, Users user);
 
-    // TODO 사진 업로드 관련 기능
-    //PhotoContestResponseDto joinPhotoContest(MultipartFile multipartFile, Users user);
-    //TimetableContestResponseDto joinTimetableContest(MultipartFile multipartFile, Users user);
+    TimetableContestResponseDto.SavedTimetableContest joinTimetableContest(MultipartFile multipartFile, Users user);
+
+    PhotoContestResponseDto.SavedPhotoContest joinPhotoContest(MultipartFile multipartFile, Users user);
 }
