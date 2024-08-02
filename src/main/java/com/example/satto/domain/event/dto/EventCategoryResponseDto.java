@@ -10,6 +10,7 @@ public record EventCategoryResponseDto(
         String category,
         Long participantsCount,
         LocalDateTime startWhen,
-        LocalDateTime untilWhen
+        LocalDateTime untilWhen,
+        String content
 ) {
 }
