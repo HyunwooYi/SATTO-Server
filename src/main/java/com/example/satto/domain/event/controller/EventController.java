@@ -1,6 +1,7 @@
 package com.example.satto.domain.event.controller;
 
 import com.example.satto.domain.event.dto.EventCategoryListResponseDto;
+import com.example.satto.domain.event.dto.EventCategoryResponseDto;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +23,7 @@ public class EventController {
 
     @Operation(method = "GET", summary = "이벤트 목록 조회", description = "현재 진행중인 이벤트 목록 조회")
     @GetMapping("")
-    public BaseResponse<EventCategoryListResponseDto> getEventList() {
+    public BaseResponse<List<EventCategoryResponseDto>> getEventList() {
         return BaseResponse.onSuccess(eventService.getEventCategoryInfoList());
     }
 }

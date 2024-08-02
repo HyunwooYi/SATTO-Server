@@ -44,7 +44,7 @@ public class EventServiceImpl implements EventService {
 
     // 이벤트 카테고리 목록 조회
     @Transactional(readOnly = true)
-    public EventCategoryListResponseDto getEventCategoryInfoList() {
+    public List<EventCategoryResponseDto> getEventCategoryInfoList() {
         List<Event> eventList = eventRepository.findAll();
         List<EventCategoryResponseDto> eventCategoryResponseDtoList = new ArrayList<>();
         for (Event event : eventList) {
@@ -55,12 +55,11 @@ public class EventServiceImpl implements EventService {
                     .participantsCount(participantsCount)
                     .startWhen(event.getStartWhen())
                     .untilWhen(event.getUntilWhen())
+                    .content(event.getContent())
                     .build();
             eventCategoryResponseDtoList.add(eventCategoryResponseDto);
         }
-        return EventCategoryListResponseDto.builder()
-                .eventCategoryResponseDtoList(eventCategoryResponseDtoList)
-                .build();
+        return eventCategoryResponseDtoList;
     }
 
     //사진 콘테스트 참여 목록 조회

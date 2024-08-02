@@ -20,6 +20,7 @@ public class Event {
     private String category;
     private LocalDateTime startWhen;
     private LocalDateTime untilWhen;
+    private String content;
 
     @OneToOne(mappedBy = "event")
     private PhotoContest photoContest;

@@ -11,7 +11,7 @@ import java.util.Properties;
 
 
 @Configuration
-@PropertySource("classpath:application.yml")
+@PropertySource("classpath:application-dev.yml")
 public class EmailConfig {
     @Value("${spring.mail.host}")
     private String host;
