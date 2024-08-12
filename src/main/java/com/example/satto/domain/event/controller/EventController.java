@@ -1,6 +1,5 @@
 package com.example.satto.domain.event.controller;
 
-import com.example.satto.domain.event.dto.EventCategoryListResponseDto;
 import com.example.satto.domain.event.dto.EventCategoryResponseDto;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.global.common.BaseResponse;

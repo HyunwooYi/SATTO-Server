@@ -1,8 +1,5 @@
 package com.example.satto.domain.event.controller;
 
-import com.example.satto.domain.event.dto.PhotoContestListResponseDto;
-import com.example.satto.domain.event.dto.PhotoContestResponseDto;
-import com.example.satto.domain.event.dto.TimetableContestListResponseDto;
 import com.example.satto.domain.event.dto.TimetableContestResponseDto;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.domain.users.entity.Users;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class TimetableContestController {
 
     @Operation(method = "GET", summary = "시간표 경진 대회: 시간표 사진 목록 조회", description = "시간표 경진 대회 참여 사진 목록 조회")
     @GetMapping("")
-    public BaseResponse<TimetableContestListResponseDto> getTimetableContestParticipants(
+    public BaseResponse<List<TimetableContestResponseDto>> getTimetableContestParticipants(
             @AuthenticationPrincipal Users user
     ) {
         return BaseResponse.onSuccess(eventService.getTimetableContestParticipants());
