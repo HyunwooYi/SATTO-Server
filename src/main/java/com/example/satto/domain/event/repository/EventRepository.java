@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryCustom {
+public interface EventRepository extends JpaRepository<Event, Long> {
      Optional<Event> findByCategory(String photoContest);
 }

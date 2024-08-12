@@ -1,6 +1,5 @@
 package com.example.satto.domain.event.controller;
 
-import com.example.satto.domain.event.dto.PhotoContestListResponseDto;
 import com.example.satto.domain.event.dto.PhotoContestResponseDto;
 import com.example.satto.domain.event.service.EventService;
 import com.example.satto.domain.users.entity.Users;
@@ -25,7 +24,7 @@ public class PhotoContestController {
 
     @Operation(method = "GET", summary = "사진 콘테스트: 사진 목록 조회", description = "사진 콘테스트 참여 사진 목록 조회")
     @GetMapping("")
-    public BaseResponse<PhotoContestListResponseDto> getPhotoContestParticipants(
+    public BaseResponse<List<PhotoContestResponseDto>> getPhotoContestParticipants(
             @AuthenticationPrincipal Users user
             ) {
         return BaseResponse.onSuccess(eventService.getPhotoContestParticipants());

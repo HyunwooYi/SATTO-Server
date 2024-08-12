@@ -10,7 +10,7 @@ public interface EventService {
 
     List<EventCategoryResponseDto> getEventCategoryInfoList();
 
-    PhotoContestListResponseDto getPhotoContestParticipants();
+    List<PhotoContestResponseDto> getPhotoContestParticipants();
 
     String likePhotoContest(Long photoContestId, Users user);
 
@@ -18,7 +18,7 @@ public interface EventService {
 
     String deletePhotoContest(Long photoContestId, Users user);
 
-    TimetableContestListResponseDto getTimetableContestParticipants();
+    List<TimetableContestResponseDto> getTimetableContestParticipants();
 
     String likeTimetableContest(Long timetableContestId, Users user);
 

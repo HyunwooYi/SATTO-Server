@@ -17,6 +17,7 @@ import com.example.satto.s3.S3Manager;
 import com.example.satto.s3.uuid.Uuid;
 import com.example.satto.s3.uuid.UuidRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
@@ -64,25 +66,24 @@ public class EventServiceImpl implements EventService {
 
     //사진 콘테스트 참여 목록 조회
     @Transactional(readOnly = true)
-    public PhotoContestListResponseDto getPhotoContestParticipants() {
+    public List<PhotoContestResponseDto> getPhotoContestParticipants() {
         List<PhotoContest> photoContestList = photoContestRepository.findAll();
         List<PhotoContestResponseDto> photoContestResponseDtoList = new ArrayList<>();
         for (PhotoContest photoContest : photoContestList) {
             Long likeCount = photoContestLikeRepository.countByPhotoContest(photoContest);
             Long dislikeCount = photoContestDislikeRepository.countByPhotoContest(photoContest);
             String name = photoContest.getUser().getName();
-            PhotoContestResponseDto.builder()
+            photoContestResponseDtoList.add(PhotoContestResponseDto.builder()
+                    .photoContestId(photoContest.getPhotoContestId())
                     .name(name)
                     .likeCount(likeCount)
                     .dislikeCount(dislikeCount)
                     .photo(photoContest.getPhotoImg())
                     .createdAt(photoContest.getCreatedAt())
                     .updatedAt(photoContest.getUpdatedAt())
-                    .build();
+                    .build());
         }
-        return PhotoContestListResponseDto.builder()
-                .photoContestResponseDtoList(photoContestResponseDtoList)
-                .build();
+        return photoContestResponseDtoList;
     }
 
     // 사진 콘테스트 좋아요 상태 변경
@@ -93,11 +94,10 @@ public class EventServiceImpl implements EventService {
 
         Optional<PhotoContestLike> photoContestLike = photoContestLikeRepository.findByUserAndPhotoContest(user, photoContest);
 
-        if(photoContestLike.isPresent()) {
+        if (photoContestLike.isPresent()) {
             photoContestLikeRepository.delete(photoContestLike.get());
             return "좋아요 취소";
-        }
-        else {
+        } else {
             photoContestLikeRepository.saveAndFlush(new PhotoContestLike(user, photoContest));
             return "좋아요 부여";
         }
@@ -111,11 +111,10 @@ public class EventServiceImpl implements EventService {
 
         Optional<PhotoContestDislike> photoContestDislike = photoContestDislikeRepository.findByUserAndPhotoContest(user, photoContest);
 
-        if(photoContestDislike.isPresent()) {
+        if (photoContestDislike.isPresent()) {
             photoContestDislikeRepository.delete(photoContestDislike.get());
             return "싫어요 취소";
-        }
-        else {
+        } else {
             photoContestDislikeRepository.saveAndFlush(new PhotoContestDislike(user, photoContest));
             return "싫어요 부여";
         }
@@ -125,21 +124,33 @@ public class EventServiceImpl implements EventService {
     public String deletePhotoContest(Long photoContestId, Users user) {
         PhotoContest photoContest = photoContestRepository.findById(photoContestId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_PHOTO));
-        if (photoContest.getUser().equals(user)) {
+        if (photoContest.getUser().getUserId().equals(user.getUserId())) {
             photoContestRepository.delete(photoContest);
             return "삭제되었습니다.";
         } else {
-            throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            return "사용자 본인이 참여한 이벤트만 삭제할 수 있습니다.";
         }
     }
 
     @Override
-    public TimetableContestListResponseDto getTimetableContestParticipants() {
-        List<TimetableContestResponseDto> timetableContestResponseDtoList = eventRepository.findAllTimetableContest();
-
-        return TimetableContestListResponseDto.builder()
-                .timetableContestResponseDtoList(timetableContestResponseDtoList)
-                .build();
+    public List<TimetableContestResponseDto> getTimetableContestParticipants() {
+        List<TimetableContest> timetableContestList = timetableContestRepository.findAll();
+        List<TimetableContestResponseDto> timetableContestResponseDtoList = new ArrayList<>();
+        for (TimetableContest timetableContest : timetableContestList) {
+            Long likeCount = timetableContestLikeRepository.countByTimetableContest(timetableContest);
+            Long dislikeCount = timetableContestDislikeRepository.countByTimetableContest(timetableContest);
+            String name = timetableContest.getUser().getName();
+            timetableContestResponseDtoList.add(TimetableContestResponseDto.builder()
+                    .timetableContestId(timetableContest.getTimetableContestId())
+                    .name(name)
+                    .likeCount(likeCount)
+                    .dislikeCount(dislikeCount)
+                    .photo(timetableContest.getPhotoImg())
+                    .createdAt(timetableContest.getCreatedAt())
+                    .updatedAt(timetableContest.getUpdatedAt())
+                    .build());
+        }
+        return timetableContestResponseDtoList;
     }
 
     @Override
@@ -149,11 +160,10 @@ public class EventServiceImpl implements EventService {
 
         Optional<TimetableContestLike> timetableContestLike = timetableContestLikeRepository.findByUserAndTimetableContest(user, timetableContest);
 
-        if(timetableContestLike.isPresent()) {
+        if (timetableContestLike.isPresent()) {
             timetableContestLikeRepository.delete(timetableContestLike.get());
             return "좋아요 취소";
-        }
-        else {
+        } else {
             timetableContestLikeRepository.saveAndFlush(new TimetableContestLike(user, timetableContest));
             return "좋아요 부여";
         }
@@ -166,11 +176,10 @@ public class EventServiceImpl implements EventService {
 
         Optional<TimetableContestDislike> timetableContestDislike = timetableContestDislikeRepository.findByUserAndTimetableContest(user, timetableContest);
 
-        if(timetableContestDislike.isPresent()) {
+        if (timetableContestDislike.isPresent()) {
             timetableContestDislikeRepository.delete(timetableContestDislike.get());
             return "싫어요 취소";
-        }
-        else {
+        } else {
             timetableContestDislikeRepository.saveAndFlush(new TimetableContestDislike(user, timetableContest));
             return "싫어요 부여";
         }
@@ -180,11 +189,11 @@ public class EventServiceImpl implements EventService {
     public String deleteTimetableContest(Long timetableContestId, Users user) {
         TimetableContest timetableContest = timetableContestRepository.findById(timetableContestId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_PHOTO));
-        if (timetableContest.getUser().equals(user)) {
+        if (timetableContest.getUser().getUserId().equals(user.getUserId())) {
             timetableContestRepository.delete(timetableContest);
             return "삭제되었습니다.";
         } else {
-            throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            return "사용자 본인이 참여한 이벤트만 삭제할 수 있습니다.";
         }
     }
 
@@ -193,6 +202,11 @@ public class EventServiceImpl implements EventService {
         String url = null;
         Event event = eventRepository.findByCategory("TimetableContest")
                 .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_EVENT));
+
+        // 중복 참여 체크
+        if (timetableContestRepository.existsByUserAndEvent(user, event)) {
+            throw new GeneralException(ErrorStatus._DUPLICATE_CONTEST_ENTRY);
+        }
 
         if (file != null && !file.isEmpty()) {
             String uuid = UUID.randomUUID().toString();
@@ -222,6 +236,11 @@ public class EventServiceImpl implements EventService {
         String url = null;
         Event event = eventRepository.findByCategory("PhotoContest")
                 .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND_EVENT));
+
+        // 중복 참여 체크
+        if (photoContestRepository.existsByUserAndEvent(user, event)) {
+            throw new GeneralException(ErrorStatus._DUPLICATE_CONTEST_ENTRY);
+        }
 
         if (file != null && !file.isEmpty()) {
             String uuid = UUID.randomUUID().toString();

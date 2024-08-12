@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface TimetableContestLikeRepository extends JpaRepository<TimetableContestLike, Long> {
     Optional<TimetableContestLike> findByUserAndTimetableContest(Users user, TimetableContest timetableContest);
+
+    Long countByTimetableContest(TimetableContest timetableContest);
 }
