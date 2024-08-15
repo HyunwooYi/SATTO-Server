@@ -34,7 +34,7 @@ public class TimetableContest extends BaseEntity {
     @JoinColumn(name = "user_id")
     private Users user;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event event;
 }

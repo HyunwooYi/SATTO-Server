@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,10 +23,10 @@ public class Event {
     private LocalDateTime untilWhen;
     private String content;
 
-    @OneToOne(mappedBy = "event")
-    private PhotoContest photoContest;
+    @OneToMany(mappedBy = "event")
+    private List<PhotoContest> photoContestList;
 
-    @OneToOne(mappedBy = "event")
-    private TimetableContest timetableContest;
+    @OneToMany(mappedBy = "event")
+    private List<TimetableContest> timetableContestList;
 
 }
