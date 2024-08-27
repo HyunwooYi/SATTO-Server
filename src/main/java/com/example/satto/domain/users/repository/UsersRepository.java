@@ -22,5 +22,7 @@ public interface UsersRepository extends JpaRepository<Users, Long>, UsersReposi
     Optional<Users> findByStudentId(String studentId);
 
     Users findByStudentId(Users studentId);
+
+    void deleteProfileImgByStudentId(String studentId);
 }
 
