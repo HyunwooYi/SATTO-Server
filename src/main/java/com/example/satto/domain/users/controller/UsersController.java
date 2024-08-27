@@ -47,8 +47,9 @@ public class UsersController {
     }
 
     @Operation(summary = "프로필 사진 수정")
-    @PatchMapping("id/{email}/profile/image")
-    public BaseResponse<String> saveProfile(@RequestParam("file") MultipartFile multipartFile, @PathVariable("email") String email) {
+    @PatchMapping("/profile/image")
+    public BaseResponse<String> saveProfile(@RequestParam("file") MultipartFile multipartFile, @AuthenticationPrincipal Users users) {
+        String email = users.getEmail();
         usersService.saveProfile(multipartFile, email);
         return BaseResponse.onSuccess("프로필 등록 성공");
     }
