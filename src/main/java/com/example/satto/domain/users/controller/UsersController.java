@@ -1,6 +1,5 @@
 package com.example.satto.domain.users.controller;
 
-//import com.example.satto.s31.FileService;
 import com.example.satto.domain.users.converter.UsersConverter;
 import com.example.satto.domain.users.dto.UsersRequestDTO;
 import com.example.satto.domain.users.dto.UsersResponseDTO;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -46,21 +46,24 @@ public class UsersController {
         }
     }
 
-//     프로필 이미지 등록
-//    @PostMapping("/id/{email}/profile/image")
-//    public BaseResponse<?> uploadProfileImg(@RequestParam("file") MultipartFile file, @PathVariable("email") String email) throws IOException {
-//        String url = fileService.uploadFile(file, FileFolder.profile_Image);
-//        usersService.uploadProfileImg(url, email);
-//        return BaseResponse.onSuccess("프로필 사진 등록 완료");
-//    }
+    @Operation(summary = "프로필 사진 수정")
+    @PatchMapping("/profile/image")
+    public BaseResponse<String> saveProfile(@RequestParam("file") MultipartFile multipartFile, @AuthenticationPrincipal Users users) {
+        String email = users.getEmail();
+        usersService.saveProfile(multipartFile, email);
+        return BaseResponse.onSuccess("프로필 등록 성공");
+    }
 
-//    // 이미지 삭제
-//    @DeleteMapping("/id/{email}/profile/image")
-//    public BaseResponse deleteProfileImg(@AuthenticationPrincipal Users user) {
-//        String profileImg = user.getProfileImg();
-//        fileService.deleteFile(profileImg);
-//        return BaseResponse.onSuccess("삭제 완료");
-//    }
+
+    // 이미지 삭제
+    @Operation(summary = "프로필 사진 삭제")
+    @DeleteMapping("/profile/image")
+    public BaseResponse<String> deleteProfileImg(@AuthenticationPrincipal Users user) {
+        String studentId = user.getStudentId();
+        usersService.deleteProfileImage(studentId);
+        return BaseResponse.onSuccess("삭제 완료");
+    }
+
 
     // 유저 프로필 페이지
     @Operation(summary = "유저 프로필 페이지", description = "유저의 이름, 학번, 팔로워 수, 팔로잉 수")

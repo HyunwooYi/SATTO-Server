@@ -1,5 +1,6 @@
 package com.example.satto.domain.users.service.Impl;
 
+import com.example.satto.config.S3Config;
 import com.example.satto.domain.follow.entity.Follow;
 import com.example.satto.domain.follow.repository.FollowRepository;
 import com.example.satto.domain.mail.dto.EmailRequestDTO;
@@ -10,12 +11,16 @@ import com.example.satto.domain.users.repository.UsersRepository;
 import com.example.satto.domain.users.service.UsersService;
 import com.example.satto.global.common.code.status.ErrorStatus;
 import com.example.satto.global.common.exception.handler.UsersHandler;
+import com.example.satto.s3.S3Manager;
+import com.example.satto.s3.uuid.Uuid;
+import com.example.satto.s3.uuid.UuidRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -27,6 +32,9 @@ public class UsersServiceImpl implements UsersService {
     private final FollowRepository followRepository;
     private final PasswordEncoder passwordEncoder;
     private final TimeTableRepository timeTableRepository;
+    private final UuidRepository uuidRepository;
+    private final S3Manager s3Manager;
+    private final S3Config s3Config;
 
     @Override
     public UserDetailsService userDetailsService() {
@@ -66,6 +74,7 @@ public class UsersServiceImpl implements UsersService {
 
     private Map<String, String> convertFollowToMap(Users user) {
         Map<String, String> userMap = new HashMap<>();
+        userMap.put("profileImg", user.getProfileImg());
         userMap.put("studentId", user.getStudentId());
         userMap.put("name", user.getName());
         userMap.put("nickname", user.getNickname());
@@ -174,6 +183,7 @@ public class UsersServiceImpl implements UsersService {
                 .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
 
         Users information = new Users();
+        information.setProfileImg(user.getProfileImg());
         information.setName(user.getName());
         information.setNickname(user.getNickname());
         information.setDepartment(user.getDepartment());
@@ -223,6 +233,45 @@ public class UsersServiceImpl implements UsersService {
             afterMap.add(convertFollowToMap(user));
         }
         return afterMap;
+    }
+
+    @Transactional
+    @Override
+    public void saveProfile(MultipartFile file, String email) {
+        String url = null;
+        if (file != null && !file.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            url = s3Manager.uploadFile(s3Manager.generateImage2(savedUuid), file);
+            Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+            user.setProfileImg(url);
+            usersRepository.save(user);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void deleteProfileImage(String studentId) {
+        Users user = usersRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+
+        // S3 버킷에서 파일 삭제
+        String profileImgUrl = user.getProfileImg();
+        if (profileImgUrl != null) {
+            String keyName = extractKeyFromUrl(profileImgUrl);
+            s3Manager.deleteFile(keyName);
+        }
+
+        // DB에서 프로필 이미지 URL 제거
+        user.setProfileImg(null);
+        usersRepository.save(user);
+    }
+
+    private String extractKeyFromUrl(String url) {
+        // URL에서 S3 key 추출 (폴더 포함)
+        return url.substring(url.indexOf(s3Config.getPath2()));
     }
 
 }
