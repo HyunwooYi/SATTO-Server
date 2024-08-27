@@ -10,23 +10,14 @@ public interface EventService {
 
     List<EventCategoryResponseDto> getEventCategoryInfoList();
 
-    List<PhotoContestResponseDto> getPhotoContestParticipants();
+    // Event API 하나로 통합
+    List<ContestResponseDto> getContestParticipants(String category);
 
-    String likePhotoContest(Long photoContestId, Users user);
+    String likeContest(Long contestId, Users user);
 
-    String dislikePhotoContest(Long photoContestId, Users user);
+    String dislikeContest(Long contestId, Users user);
 
-    String deletePhotoContest(Long photoContestId, Users user);
+    String deleteContest(Long contestId, Users user);
 
-    List<TimetableContestResponseDto> getTimetableContestParticipants();
-
-    String likeTimetableContest(Long timetableContestId, Users user);
-
-    String dislikeTimetableContest(Long timetableContestId, Users user);
-
-    String deleteTimetableContest(Long timetableContestId, Users user);
-
-    TimetableContestResponseDto.SavedTimetableContest joinTimetableContest(MultipartFile multipartFile, Users user);
-
-    PhotoContestResponseDto.SavedPhotoContest joinPhotoContest(MultipartFile multipartFile, Users user);
+    ContestResponseDto.SavedContest joinContest(String category, MultipartFile multipartFile, Users user);
 }

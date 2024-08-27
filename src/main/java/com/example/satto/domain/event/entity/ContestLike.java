@@ -1,4 +1,4 @@
-package com.example.satto.domain.event.entity.timetableContest;
+package com.example.satto.domain.event.entity;
 
 import com.example.satto.domain.users.entity.Users;
 import jakarta.persistence.*;
@@ -9,21 +9,21 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Getter
-public class TimetableContestDislike {
+public class ContestLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dislikeId;
+    private Long likeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "timetable_contest_id")
-    private TimetableContest timetableContest;
+    @JoinColumn(name = "contest_id")
+    private Contest contest;
 
-    public TimetableContestDislike(Users user, TimetableContest timetableContest) {
+    public ContestLike(Users user, Contest contest) {
         this.user = user;
-        this.timetableContest = timetableContest;
+        this.contest = contest;
     }
 }
