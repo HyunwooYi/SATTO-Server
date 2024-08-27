@@ -74,6 +74,7 @@ public class UsersServiceImpl implements UsersService {
 
     private Map<String, String> convertFollowToMap(Users user) {
         Map<String, String> userMap = new HashMap<>();
+        userMap.put("profileImg", user.getProfileImg());
         userMap.put("studentId", user.getStudentId());
         userMap.put("name", user.getName());
         userMap.put("nickname", user.getNickname());
@@ -182,6 +183,7 @@ public class UsersServiceImpl implements UsersService {
                 .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
 
         Users information = new Users();
+        information.setProfileImg(user.getProfileImg());
         information.setName(user.getName());
         information.setNickname(user.getNickname());
         information.setDepartment(user.getDepartment());

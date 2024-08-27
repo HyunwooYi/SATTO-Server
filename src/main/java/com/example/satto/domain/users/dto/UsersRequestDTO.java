@@ -9,7 +9,7 @@ public class UsersRequestDTO {
     public static class UpdateUserDTO {
         private String name;
         private String nickname;
-//        private String profileImg;
+        private String profileImg;
         private String department;
         private int grade;
     }
