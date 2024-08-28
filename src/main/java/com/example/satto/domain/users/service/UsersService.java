@@ -51,7 +51,11 @@ public interface UsersService {
 
     List<Map<String, String>> searchUserByName(String query);
 
+
+    Long findId(String email);
+
     void saveProfile(MultipartFile multipartFile, String email);
 
     void deleteProfileImage(String studentId);
+
 }

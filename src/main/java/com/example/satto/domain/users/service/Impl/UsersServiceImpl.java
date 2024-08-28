@@ -143,6 +143,7 @@ public class UsersServiceImpl implements UsersService {
 
         user.setName(updateUserDTO.getName());
         user.setNickname(updateUserDTO.getNickname());
+        user.setPassword(passwordEncoder.encode(updateUserDTO.getPassword()));
         user.setDepartment(updateUserDTO.getDepartment());
         user.setGrade(updateUserDTO.getGrade());
 
@@ -207,7 +208,9 @@ public class UsersServiceImpl implements UsersService {
     public void resetPassword(UsersRequestDTO.UpdateUserPasswordDTO updateUserPasswordDTO, Long userId) {
         Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        System.out.println("받아온 비번: " +updateUserPasswordDTO.getPassword());
         user.setPassword(passwordEncoder.encode(updateUserPasswordDTO.getPassword()));
+        System.out.println("암호화 된 비번: " +passwordEncoder.encode(updateUserPasswordDTO.getPassword()));
         usersRepository.save(user);
     }
 
@@ -234,6 +237,11 @@ public class UsersServiceImpl implements UsersService {
         }
         return afterMap;
     }
+
+    @Override
+    public Long findId(String email) {
+        Long userId = usersRepository.findIdByEmail(email);
+        return userId;
 
     @Transactional
     @Override
@@ -272,6 +280,7 @@ public class UsersServiceImpl implements UsersService {
     private String extractKeyFromUrl(String url) {
         // URL에서 S3 key 추출 (폴더 포함)
         return url.substring(url.indexOf(s3Config.getPath2()));
+
     }
 
 }

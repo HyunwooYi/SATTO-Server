@@ -1,6 +1,7 @@
 package com.example.satto.domain.mail.service.Impl;
 
 import com.example.satto.domain.mail.service.EmailService;
+import com.example.satto.domain.users.entity.Users;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.MailException;
@@ -20,6 +21,7 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender emailSender;
 
     public static final String ePw = createKey();
+    public static final String findePw = createKey();
 
     public EmailServiceImpl(JavaMailSender emailSender) {
         this.emailSender = emailSender;
@@ -47,7 +49,7 @@ public class EmailServiceImpl implements EmailService {
         msgg+= ePw+"</strong><div><br/> ";
         msgg+= "</div>";
         message.setText(msgg, "utf-8", "html");//내용
-        message.setFrom(new InternetAddress("rhythmpal0219@gmail.com","hyun"));//보내는 사람
+        message.setFrom(new InternetAddress("satto202409@gmail.com","satto"));//보내는 사람
 
         return message;
     }
@@ -88,4 +90,48 @@ public class EmailServiceImpl implements EmailService {
         }
         return ePw;
     }
+
+    @Override
+    public String sendFindPwMessage(String toEmail)throws Exception {
+        // TODO Auto-generated method stub
+        MimeMessage message = findPwMessage(toEmail);
+        try{//예외처리
+            emailSender.send(message);
+        }catch(MailException es){
+            es.printStackTrace();
+            throw new IllegalArgumentException();
+        }
+        return findePw;
+    }
+
+
+    private MimeMessage findPwMessage(String toEmail) throws Exception {
+        System.out.println("보내는 대상 : "+ toEmail);
+        System.out.println("인증 번호 : "+findePw);
+
+        MimeMessage  message = emailSender.createMimeMessage();
+        ((MimeMessage) message).addRecipients(MimeMessage.RecipientType.TO, toEmail);//보내는 대상
+        message.setSubject("임시 비밀번호 발급");//제목
+
+        String msgg="";
+        msgg+= "<div style='margin:15px;'>";
+        msgg+= "<h1> SATTO </h1>";
+        msgg+= "<br>";
+        msgg+= "<p>아래 임시 비밀번호를 복사해 입력해주세요<p>";
+        msgg+= "<br>";
+        msgg+= "<p>감사합니다.<p>";
+        msgg+= "<br>";
+        msgg+= "<div align='center' style='border:1px solid black; font-family:verdana';>";
+        msgg+= "<h3 style='color:blue;'>임시 비밀번호 코드입니다.</h3>";
+        msgg+= "<div style='font-size:130%'>";
+        msgg+= "CODE : <strong>";
+        msgg+= findePw+"</strong><div><br/> ";
+        msgg+= "</div>";
+        message.setText(msgg, "utf-8", "html");//내용
+        message.setFrom(new InternetAddress("satto202409@gmail.com","satto"));//보내는 사람
+
+        return message;
+
+    }
+
 }
