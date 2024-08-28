@@ -11,4 +11,6 @@ public interface ContestLikeRepository extends JpaRepository<ContestLike, Long> 
     Optional<ContestLike> findByUserAndContest(Users user, Contest contest);
 
     Long countByContest(Contest photoContest);
+
+    boolean existsByUserAndContest(Users user, Contest contest);
 }

@@ -35,7 +35,7 @@ public class EventController {
             @AuthenticationPrincipal Users user,
             @PathVariable(name = "category") String category
     ) {
-        return BaseResponse.onSuccess(eventService.getContestParticipants(category));
+        return BaseResponse.onSuccess(eventService.getContestParticipants(user, category));
     }
 
     @Operation(method = "POST", summary = "이벤트 좋아요 누르기", description = "좋아요 상태면 좋아요 취소, 좋아요 상태가 아니면 좋아요 부여")

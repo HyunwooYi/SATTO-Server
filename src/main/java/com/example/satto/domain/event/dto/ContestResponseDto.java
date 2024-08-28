@@ -8,9 +8,12 @@ import java.time.LocalDateTime;
 public record ContestResponseDto(
         Long contestId,
         String name,
+        String studentId,
         String photo,
         Long likeCount,
         Long dislikeCount,
+        boolean isLiked,
+        boolean isDisliked,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
