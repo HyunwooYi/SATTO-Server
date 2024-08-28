@@ -1,6 +1,5 @@
-package com.example.satto.domain.event.entity.photoContest;
+package com.example.satto.domain.event.entity;
 
-import com.example.satto.domain.event.entity.Event;
 import com.example.satto.domain.users.entity.Users;
 import com.example.satto.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -14,20 +13,21 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Getter
-public class PhotoContest extends BaseEntity {
+public class Contest extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long photoContestId;
+    private Long contestId;
 
-    private String photoImg;
+    private String img;
+    private String category;
 
-    @OneToMany(mappedBy = "photoContest", cascade = CascadeType.ALL)
-    List<PhotoContestLike> photoContestLikeList = new ArrayList<>();
+    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL)
+    List<ContestLike> contestLikeList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "photoContest", cascade = CascadeType.ALL)
-    List<PhotoContestDislike> photoContestDislikeList = new ArrayList<>();
+    @OneToMany(mappedBy = "contest", cascade = CascadeType.ALL)
+    List<ContestDislike> contestDislikeList = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
 

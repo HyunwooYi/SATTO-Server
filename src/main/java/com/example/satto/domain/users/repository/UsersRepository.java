@@ -27,5 +27,6 @@ public interface UsersRepository extends JpaRepository<Users, Long>, UsersReposi
 
     @Query("SELECT u.userId FROM Users u WHERE u.email = :email")
     Long findIdByEmail(@Param("email") String email);
+    void deleteProfileImgByStudentId(String studentId);
 }
 

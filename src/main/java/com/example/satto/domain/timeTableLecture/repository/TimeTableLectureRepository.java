@@ -23,6 +23,9 @@ public interface TimeTableLectureRepository extends JpaRepository<TimeTableLectu
     @Query("select l from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")
     List<TimeTableLecture> findTimeTableLecturesByTimeTableId(@Param("timeTableId")Long timeTableId);
 
+    @Query("select l.currentLecture.codeSection from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")
+    List<String> findTimeTableLecturesCodeSectionByTimeTableId(@Param("timeTableId")Long timeTableId);
+
     @Transactional
     @Modifying
     @Query("delete from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")

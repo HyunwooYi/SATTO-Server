@@ -19,7 +19,7 @@ public class UsersResponseDTO {
         private String nickname;
         private String department;
         private int grade;
-//        private String profileImg;
+        private String profileImg;
         private LocalDateTime createdAt;
         private LocalDateTime updateAt;
     }
@@ -27,6 +27,7 @@ public class UsersResponseDTO {
     @Getter
     @Builder
     public static class ExistUserDTO {
+        private String profileImg;
         private String name;
         private String nickname;
         private String department;
@@ -36,6 +37,7 @@ public class UsersResponseDTO {
     @Getter
     @Builder
     public static class UserProfileDTO {
+        private String profileImg;
         private String studentId;
         private String name;
         private String department;
@@ -48,6 +50,7 @@ public class UsersResponseDTO {
     @Getter
     @Builder
     public static class UserInformation2 {
+        private String profileImg;
         private String studentId;
         private String name;
         private String nickname;

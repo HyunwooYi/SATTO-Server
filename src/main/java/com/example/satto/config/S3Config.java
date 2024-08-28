@@ -35,6 +35,10 @@ public class S3Config {
     @Value("${cloud.aws.s3.folder.folderName1}")
     private String path;
 
+    @Value("${cloud.aws.s3.folder.folderName2}")
+    private String path2;
+
+
     @PostConstruct
     public void init() {
         this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);

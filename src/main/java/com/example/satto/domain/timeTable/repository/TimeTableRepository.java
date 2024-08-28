@@ -26,4 +26,7 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     TimeTable findLatestRepresentedTimeTableByUserId(@Param("userId") Long userId);
 
     void deleteAllByUsers(Users users);
+
+    @Query("SELECT t.timetableId FROM TimeTable t WHERE t.users.studentId = :studentId AND t.isRepresented = true ORDER BY t.createdAt DESC")
+    Long findLatestRepresentedTimeTableIdByUserId(@Param("studentId") String studentId);
 }

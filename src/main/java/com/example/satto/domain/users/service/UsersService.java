@@ -4,6 +4,7 @@ import com.example.satto.domain.mail.dto.EmailRequestDTO;
 import com.example.satto.domain.users.dto.UsersRequestDTO;
 import com.example.satto.domain.users.entity.Users;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -50,5 +51,11 @@ public interface UsersService {
 
     List<Map<String, String>> searchUserByName(String query);
 
+
     Long findId(String email);
+
+    void saveProfile(MultipartFile multipartFile, String email);
+
+    void deleteProfileImage(String studentId);
+
 }

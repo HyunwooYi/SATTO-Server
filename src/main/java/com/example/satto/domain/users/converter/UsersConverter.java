@@ -22,6 +22,7 @@ public class UsersConverter {
 
     public static UsersResponseDTO.ExistUserDTO toUserShowDTO(Users user) {
         return UsersResponseDTO.ExistUserDTO.builder()
+                .profileImg(user.getProfileImg())
                 .name(user.getName())
                 .nickname(user.getNickname())
                 .department(user.getDepartment())
@@ -32,6 +33,7 @@ public class UsersConverter {
 
     public static UsersResponseDTO.UserProfileDTO toUserProfileDTO(Users user, int followerNum, int followingNum) {
         return UsersResponseDTO.UserProfileDTO.builder()
+                .profileImg(user.getProfileImg())
                 .name(user.getName())
                 .studentId(user.getStudentId())
                 .nickname(user.getNickname())
@@ -45,6 +47,7 @@ public class UsersConverter {
 
     public static UsersResponseDTO.UserInformation2 toUserInformation2(Users user) {
         return UsersResponseDTO.UserInformation2.builder()
+                .profileImg(user.getProfileImg())
                 .studentId(user.getStudentId())
                 .name(user.getName())
                 .nickname(user.getNickname())

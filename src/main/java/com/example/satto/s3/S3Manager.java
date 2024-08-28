@@ -27,6 +27,10 @@ public class S3Manager {
     public String uploadFile(String keyName, MultipartFile file){
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
+
+        // 파일의 Content-Type 설정
+        metadata.setContentType(file.getContentType());
+
         try {
             amazonS3.putObject(new PutObjectRequest(s3Config.getBucket(), keyName, file.getInputStream(), metadata));
         }catch (IOException e){
@@ -39,4 +43,15 @@ public class S3Manager {
     public String generateImage(Uuid savedUuid) {
         return s3Config.getPath() + '/' + savedUuid.getUuid();
     }
+
+    // 유저 프로필 이미지 업로드
+    public String generateImage2(Uuid savedUuid) {
+        return s3Config.getPath2() + '/' + savedUuid.getUuid();
+    }
+
+    public void deleteFile(String keyName) {
+        amazonS3.deleteObject(s3Config.getBucket(), keyName);
+    }
+
+
 }
