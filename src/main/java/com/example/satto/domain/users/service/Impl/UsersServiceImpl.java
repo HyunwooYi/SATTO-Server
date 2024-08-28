@@ -242,6 +242,7 @@ public class UsersServiceImpl implements UsersService {
     public Long findId(String email) {
         Long userId = usersRepository.findIdByEmail(email);
         return userId;
+    }
 
     @Transactional
     @Override
