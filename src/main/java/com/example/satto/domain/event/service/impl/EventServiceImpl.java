@@ -60,18 +60,23 @@ public class EventServiceImpl implements EventService {
 
     // Event API 하나로 통합
     @Override
-    public List<ContestResponseDto> getContestParticipants(String category) {
+    public List<ContestResponseDto> getContestParticipants(Users user, String category) {
         List<Contest> contestList = contestRepository.findAllByCategory(category);
         List<ContestResponseDto> contestResponseDtoList = new ArrayList<>();
         for (Contest contest : contestList) {
             Long likeCount = contestLikeRepository.countByContest(contest);
             Long dislikeCount = contestDislikeRepository.countByContest(contest);
+            boolean isLiked = contestLikeRepository.existsByUserAndContest(user, contest);
+            boolean isDisliked = contestDislikeRepository.existsByUserAndContest(user, contest);
             String name = contest.getUser().getName();
             contestResponseDtoList.add(ContestResponseDto.builder()
                     .contestId(contest.getContestId())
                     .name(name)
+                    .studentId(contest.getUser().getStudentId())
                     .likeCount(likeCount)
                     .dislikeCount(dislikeCount)
+                    .isLiked(isLiked)
+                    .isDisliked(isDisliked)
                     .photo(contest.getImg())
                     .createdAt(contest.getCreatedAt())
                     .updatedAt(contest.getUpdatedAt())

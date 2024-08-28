@@ -11,7 +11,7 @@ public interface EventService {
     List<EventCategoryResponseDto> getEventCategoryInfoList();
 
     // Event API 하나로 통합
-    List<ContestResponseDto> getContestParticipants(String category);
+    List<ContestResponseDto> getContestParticipants(Users user, String category);
 
     String likeContest(Long contestId, Users user);
 
