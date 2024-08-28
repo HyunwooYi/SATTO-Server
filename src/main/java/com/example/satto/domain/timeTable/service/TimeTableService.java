@@ -381,17 +381,32 @@ public class TimeTableService {
         Users target = usersRepository.findByStudentId(studentId).orElseThrow();
         List<TimeTable> timeTables = new ArrayList<>();
 
-        //1차 배포시 공개, 비공개 사용자 구분x
-//        if(!target.isPublic()){
-//            if(!followRepository.existsByFollowerIdStudentIdAndFollowingIdStudentId(users.getStudentId(), studentId)){
-//                throw new IllegalStateException("볼 수 있는 시간표가 존재하지 않습니다.");
-//            }
-//        }
+
+        if(!target.isPublic()){
+            if(!followRepository.existsByFollowerIdStudentIdAndFollowingIdStudentId(users.getStudentId(), studentId)){
+                throw new IllegalStateException("볼 수 있는 시간표가 존재하지 않습니다.");
+            }
+        }
         timeTables = timeTableRepository.findTimeTableByStudentId(studentId);
 
         return TimeTableResponseDTO.timeTableListDTO.fromList(timeTables);
     }
 
+    public List<List<String>> compareTimeTable(CompareTimeTableRequestDTO compare){
+
+        List<Long> timeTableIds = new ArrayList<>();
+        List<String> result = new ArrayList<>();
+        List<List<String>> codeSectionLists = new ArrayList<>();
+        for( String studentId : compare.studentIds()){
+            timeTableIds.add(timeTableRepository.findLatestRepresentedTimeTableIdByUserId(studentId));
+        }
+        for( Long tinmeTableId : timeTableIds) {
+            result = timeTableLectureRepository.findTimeTableLecturesCodeSectionByTimeTableId(tinmeTableId);
+            codeSectionLists.add(result);
+        }
+
+        return codeSectionLists;
+    }
     public void updateTimeTableIsPublic(Long timeTableId, UpdateTimeTableRequestDTO isPublic){
 
         TimeTable timeTable = timeTableRepository.findById(timeTableId).orElseThrow();
