@@ -49,4 +49,6 @@ public interface UsersService {
     List<Map<String, String>> searchUserByStudentId(String query);
 
     List<Map<String, String>> searchUserByName(String query);
+
+    Long findId(String email);
 }

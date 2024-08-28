@@ -13,4 +13,9 @@ public class EmailRequestDTO {
     public static class EmailCheckRequest {
         private String studentId; // 학번
     }
+
+    @Getter
+    public static class FindPwRequest {
+        private String email; // 학번
+    }
 }
