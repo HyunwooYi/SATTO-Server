@@ -64,6 +64,11 @@ public class TimeTableController {
         return BaseResponse.onSuccess(timeTableService.getOtherTimeTableList(studentId, users));
     }
 
+    @PostMapping("/compare")
+    public BaseResponse<List<List<String>>> compareTimeTable(@RequestBody CompareTimeTableRequestDTO compare){
+        return  BaseResponse.onSuccess(timeTableService.compareTimeTable(compare));
+    }
+
     @PatchMapping("/{timeTableId}")
     public BaseResponse<String> updateTimeTable(@PathVariable(name = "timeTableId") Long timeTableId,@RequestBody UpdateTimeTableLectRequestDTO updateDTO){
         timeTableLectureService.deleteAll(timeTableId);
