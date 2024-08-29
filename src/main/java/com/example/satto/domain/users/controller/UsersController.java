@@ -126,9 +126,9 @@ public class UsersController {
 
     @Operation(summary = "비밀번호 재설정")
     @PatchMapping("account/pw")
-    public BaseResponse<?> resetPassword(@RequestBody UsersRequestDTO.UpdateUserPassword2DTO updateUserPassword2DTO, @AuthenticationPrincipal Users user) {
+    public BaseResponse<?> resetPassword(@RequestBody UsersRequestDTO.UpdateUserPasswordDTO updateUserPasswordDTO, @AuthenticationPrincipal Users user) {
         Long userId = user.getUserId();
-        usersService.resetPassword(updateUserPassword2DTO, userId);
+        usersService.resetPassword2(updateUserPasswordDTO, userId);
         return BaseResponse.onSuccess("비밀번호 재설정 완료");
     }
 

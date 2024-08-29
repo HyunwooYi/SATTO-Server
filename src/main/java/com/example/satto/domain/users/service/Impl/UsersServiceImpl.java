@@ -241,6 +241,7 @@ public class UsersServiceImpl implements UsersService {
     public Long findId(String email) {
         Long userId = usersRepository.findIdByEmail(email);
         return userId;
+    }
 
     @Transactional
     @Override
@@ -276,17 +277,12 @@ public class UsersServiceImpl implements UsersService {
         usersRepository.save(user);
     }
 
-    @Override
-    public void resetPassword(UsersRequestDTO.UpdateUserPassword2DTO updateUserPassword2DTO, Long userId) {
+
+    public void resetPassword2 (UsersRequestDTO.UpdateUserPasswordDTO updateUserPasswordDTO, Long userId) {
         Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
-        if (updateUserPassword2DTO.getPassword1().equals(updateUserPassword2DTO.getPassword2())) {
-            user.setPassword(passwordEncoder.encode(updateUserPassword2DTO.getPassword1()));
+            user.setPassword(passwordEncoder.encode(updateUserPasswordDTO.getPassword()));
             usersRepository.save(user);
-        } else {
-            throw new UsersHandler(ErrorStatus._INVALID_PW);
-        }
-
     }
 
     private String extractKeyFromUrl(String url) {

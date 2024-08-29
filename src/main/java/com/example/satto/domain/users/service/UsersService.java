@@ -58,5 +58,5 @@ public interface UsersService {
 
     void deleteProfileImage(String studentId);
 
-    void resetPassword(UsersRequestDTO.UpdateUserPassword2DTO updateUserPassword2DTO, Long userId);
+    void resetPassword2(UsersRequestDTO.UpdateUserPasswordDTO updateUserPasswordDTO, Long userId);
 }
