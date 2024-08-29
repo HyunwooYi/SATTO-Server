@@ -143,7 +143,6 @@ public class UsersServiceImpl implements UsersService {
 
         user.setName(updateUserDTO.getName());
         user.setNickname(updateUserDTO.getNickname());
-        user.setPassword(passwordEncoder.encode(updateUserDTO.getPassword()));
         user.setDepartment(updateUserDTO.getDepartment());
         user.setGrade(updateUserDTO.getGrade());
 
@@ -276,6 +275,19 @@ public class UsersServiceImpl implements UsersService {
         // DB에서 프로필 이미지 URL 제거
         user.setProfileImg(null);
         usersRepository.save(user);
+    }
+
+    @Override
+    public void resetPassword(UsersRequestDTO.UpdateUserPassword2DTO updateUserPassword2DTO, Long userId) {
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new UsersHandler(ErrorStatus._NOT_FOUND_USER));
+        if (updateUserPassword2DTO.getPassword1().equals(updateUserPassword2DTO.getPassword2())) {
+            user.setPassword(passwordEncoder.encode(updateUserPassword2DTO.getPassword1()));
+            usersRepository.save(user);
+        } else {
+            throw new UsersHandler(ErrorStatus._INVALID_PW);
+        }
+
     }
 
     private String extractKeyFromUrl(String url) {
