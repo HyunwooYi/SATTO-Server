@@ -47,7 +47,7 @@ public class UsersController {
     }
 
     @Operation(summary = "프로필 사진 수정")
-    @PatchMapping("/profile/image")
+    @PatchMapping(value = "/profile/image", consumes = "multipart/form-data")
     public BaseResponse<String> saveProfile(@RequestParam("file") MultipartFile multipartFile, @AuthenticationPrincipal Users users) {
         String email = users.getEmail();
         usersService.saveProfile(multipartFile, email);
