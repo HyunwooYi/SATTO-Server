@@ -1,5 +1,6 @@
 package com.example.satto.domain.timeTableLecture.repository;
 
+import com.example.satto.domain.currentLecture.entity.CurrentLecture;
 import com.example.satto.domain.timeTable.entity.TimeTable;
 import com.example.satto.domain.timeTableLecture.entity.TimeTableLecture;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,8 +24,8 @@ public interface TimeTableLectureRepository extends JpaRepository<TimeTableLectu
     @Query("select l from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")
     List<TimeTableLecture> findTimeTableLecturesByTimeTableId(@Param("timeTableId")Long timeTableId);
 
-    @Query("select l.currentLecture.codeSection from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")
-    List<String> findTimeTableLecturesCodeSectionByTimeTableId(@Param("timeTableId")Long timeTableId);
+    @Query("select l.currentLecture from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")
+    List<CurrentLecture> findCurrentLecturesByTimeTableId(@Param("timeTableId")Long timeTableId);
 
     @Transactional
     @Modifying

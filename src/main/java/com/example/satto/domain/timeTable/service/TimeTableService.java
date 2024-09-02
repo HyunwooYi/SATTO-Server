@@ -392,21 +392,54 @@ public class TimeTableService {
         return TimeTableResponseDTO.timeTableListDTO.fromList(timeTables);
     }
 
-    public List<List<String>> compareTimeTable(CompareTimeTableRequestDTO compare){
+    //공강비교용
+    public List<List<TimeTableResponseDTO.TimeTableLectureDTO>> compareTimeTableGap(CompareTimeTableRequestDTO compare){
 
         List<Long> timeTableIds = new ArrayList<>();
-        List<String> result = new ArrayList<>();
-        List<List<String>> codeSectionLists = new ArrayList<>();
+        List<CurrentLecture> currentLectures = new ArrayList<>();
+        List<TimeTableResponseDTO.TimeTableLectureDTO> lect = new ArrayList<>();
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> result = new ArrayList<>();
         for( String studentId : compare.studentIds()){
             timeTableIds.add(timeTableRepository.findLatestRepresentedTimeTableIdByUserId(studentId));
         }
         for( Long tinmeTableId : timeTableIds) {
-            result = timeTableLectureRepository.findTimeTableLecturesCodeSectionByTimeTableId(tinmeTableId);
-            codeSectionLists.add(result);
+            currentLectures = timeTableLectureRepository.findCurrentLecturesByTimeTableId(tinmeTableId);
+            lect = TimeTableResponseDTO.TimeTableLectureDTO.fromList(currentLectures);
+            result.add(lect);
         }
 
-        return codeSectionLists;
+        return result;
     }
+    public List<List<TimeTableResponseDTO.TimeTableLectureDTO>> compareTimeTableLect(CompareTimeTableRequestDTO compare, Users users) {
+
+        Long myTimeTableId = timeTableRepository.findLatestRepresentedTimeTableIdByUserId(users.getStudentId());
+
+        List<CurrentLecture> myCurrentLectures = timeTableLectureRepository.findCurrentLecturesByTimeTableId(myTimeTableId);
+        List<TimeTableResponseDTO.TimeTableLectureDTO> myLectures = TimeTableResponseDTO.TimeTableLectureDTO.fromList(myCurrentLectures);
+
+        List<List<TimeTableResponseDTO.TimeTableLectureDTO>> overlappingLecturesList = new ArrayList<>();
+
+        for (String studentId : compare.studentIds()) {
+            Long friendTimeTableId = timeTableRepository.findLatestRepresentedTimeTableIdByUserId(studentId);
+            List<TimeTableResponseDTO.TimeTableLectureDTO> overlappingLectures = new ArrayList<>();
+
+            if (friendTimeTableId != null) {
+                List<CurrentLecture> friendCurrentLectures = timeTableLectureRepository.findCurrentLecturesByTimeTableId(friendTimeTableId);
+                List<TimeTableResponseDTO.TimeTableLectureDTO> friendLectures = TimeTableResponseDTO.TimeTableLectureDTO.fromList(friendCurrentLectures);
+
+                for (TimeTableResponseDTO.TimeTableLectureDTO friendLecture : friendLectures) {
+                    if (myLectures.contains(friendLecture)) {
+                        overlappingLectures.add(friendLecture);
+                    }
+                }
+            }
+
+            overlappingLecturesList.add(overlappingLectures);
+        }
+
+        return overlappingLecturesList;
+    }
+
     public void updateTimeTableIsPublic(Long timeTableId, UpdateTimeTableRequestDTO isPublic){
 
         TimeTable timeTable = timeTableRepository.findById(timeTableId).orElseThrow();
