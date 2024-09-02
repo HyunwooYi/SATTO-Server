@@ -64,9 +64,14 @@ public class TimeTableController {
         return BaseResponse.onSuccess(timeTableService.getOtherTimeTableList(studentId, users));
     }
 
-    @PostMapping("/compare")
-    public BaseResponse<List<List<String>>> compareTimeTable(@RequestBody CompareTimeTableRequestDTO compare){
-        return  BaseResponse.onSuccess(timeTableService.compareTimeTable(compare));
+    @PostMapping("/compare/gap")
+    public BaseResponse<List<List<TimeTableResponseDTO.TimeTableLectureDTO>>> compareTimeTableGap(@RequestBody CompareTimeTableRequestDTO compare){
+        return  BaseResponse.onSuccess(timeTableService.compareTimeTableGap(compare));
+    }
+
+    @PostMapping("/compare/lect")
+    public BaseResponse<List<List<TimeTableResponseDTO.TimeTableLectureDTO>>> compareTimeTableLect(@RequestBody CompareTimeTableRequestDTO compare, @AuthenticationPrincipal Users users){
+        return  BaseResponse.onSuccess(timeTableService.compareTimeTableLect(compare,users));
     }
 
     @PatchMapping("/{timeTableId}")

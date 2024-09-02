@@ -22,11 +22,11 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     @Query("select t from TimeTable t where t.users.studentId = :studentId")
     List<TimeTable> findTimeTableByStudentId(@Param("studentId") String studentId);
 
-    @Query("SELECT t FROM TimeTable t WHERE t.users.userId = :userId AND t.isRepresented = true ORDER BY t.createdAt DESC")
+    @Query("SELECT t FROM TimeTable t WHERE t.users.userId = :userId AND t.isRepresented = true ORDER BY t.semesterYear DESC")
     TimeTable findLatestRepresentedTimeTableByUserId(@Param("userId") Long userId);
 
     void deleteAllByUsers(Users users);
 
-    @Query("SELECT t.timetableId FROM TimeTable t WHERE t.users.studentId = :studentId AND t.isRepresented = true ORDER BY t.createdAt DESC")
+    @Query("SELECT t.timetableId FROM TimeTable t WHERE t.users.studentId = :studentId AND t.isRepresented = true ORDER BY t.semesterYear DESC")
     Long findLatestRepresentedTimeTableIdByUserId(@Param("studentId") String studentId);
 }
