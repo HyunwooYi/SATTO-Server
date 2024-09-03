@@ -50,6 +50,21 @@ public class FollowServiceImpl implements FollowService {
         return followRequesters;
     }
 
+    @Override
+    public BaseResponse<String> findFollowRequestToChangePublic(String studentId) {
+        List<Follow> followerRequests = followRepository.findByFollowingIdStudentIdAndRequest(studentId, 1);
+        if (followerRequests.isEmpty()) {
+            return BaseResponse.onSuccess("Follow 요청 목록이 비어있습니다.");
+        }
+        else {
+            for (Follow user: followerRequests) {
+                user.setRequest(2);
+                followRepository.save(user);
+            }
+            return BaseResponse.onSuccess("Follow 요청 모록 유저들을 수락했습니다.");
+        }
+    }
+
     @Transactional
     @Override
     public BaseResponse<Object> acceptFollower(String followerId, String studentId) {

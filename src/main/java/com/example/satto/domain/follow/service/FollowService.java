@@ -17,4 +17,6 @@ public interface FollowService {
     BaseResponse<Object> unFollowing(String followingId, String studentId);
 
     Map<String, String> followRequestList(String studentId);
+
+     BaseResponse<String> findFollowRequestToChangePublic(String studentId);
 }
