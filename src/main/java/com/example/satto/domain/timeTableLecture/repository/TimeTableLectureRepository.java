@@ -3,6 +3,7 @@ package com.example.satto.domain.timeTableLecture.repository;
 import com.example.satto.domain.currentLecture.entity.CurrentLecture;
 import com.example.satto.domain.timeTable.entity.TimeTable;
 import com.example.satto.domain.timeTableLecture.entity.TimeTableLecture;
+import com.example.satto.domain.users.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +32,6 @@ public interface TimeTableLectureRepository extends JpaRepository<TimeTableLectu
     @Modifying
     @Query("delete from TimeTableLecture l where l.timeTable.timetableId = :timeTableId")
     void deleteByTimeTableId(@Param("timeTableId") Long timeTableId);
+
+    void deleteAllByTimeTable_Users(Users user);
 }

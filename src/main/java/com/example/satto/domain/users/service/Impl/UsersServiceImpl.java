@@ -5,6 +5,7 @@ import com.example.satto.domain.follow.entity.Follow;
 import com.example.satto.domain.follow.repository.FollowRepository;
 import com.example.satto.domain.mail.dto.EmailRequestDTO;
 import com.example.satto.domain.timeTable.repository.TimeTableRepository;
+import com.example.satto.domain.timeTableLecture.repository.TimeTableLectureRepository;
 import com.example.satto.domain.users.dto.UsersRequestDTO;
 import com.example.satto.domain.users.entity.Users;
 import com.example.satto.domain.users.repository.UsersRepository;
@@ -32,6 +33,7 @@ public class UsersServiceImpl implements UsersService {
     private final FollowRepository followRepository;
     private final PasswordEncoder passwordEncoder;
     private final TimeTableRepository timeTableRepository;
+    private final TimeTableLectureRepository timeTableLectureRepository;
     private final UuidRepository uuidRepository;
     private final S3Manager s3Manager;
     private final S3Config s3Config;
@@ -173,6 +175,7 @@ public class UsersServiceImpl implements UsersService {
     public void withdrawal(Users user) {
         followRepository.deleteByFollowingId(user);
         followRepository.deleteByFollowerId(user);
+        timeTableLectureRepository.deleteAllByTimeTable_Users(user);
         timeTableRepository.deleteAllByUsers(user);
         usersRepository.deleteById(user.getUserId());
     }
