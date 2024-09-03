@@ -1,5 +1,6 @@
 package com.example.satto.domain.users.controller;
 
+import com.example.satto.domain.follow.service.FollowService;
 import com.example.satto.domain.users.converter.UsersConverter;
 import com.example.satto.domain.users.dto.UsersRequestDTO;
 import com.example.satto.domain.users.dto.UsersResponseDTO;
@@ -22,6 +23,7 @@ import java.util.Map;
 public class UsersController {
 
     private final UsersService usersService;
+    private final FollowService followService;
 //    private final FileService fileService;
 
     // email 중복 확인
@@ -120,6 +122,8 @@ public class UsersController {
     @PatchMapping("account/public")
     public BaseResponse<?> publicAccount(@AuthenticationPrincipal Users user) {
         Long userId = user.getUserId();
+        String studentId = user.getStudentId();
+        followService.findFollowRequestToChangePublic(studentId);
         usersService.publicAccount(userId);
         return BaseResponse.onSuccess("공개 설정 완료");
     }
